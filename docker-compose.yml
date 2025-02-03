@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    container_name: workshop_db
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+
+  backend:
+    build: .
+    container_name: workshop_server
+    restart: always
+    depends_on:
+      - db
+    env_file:
+      - .env
+    volumes:
+      - ./server
+    ports:
+      - "3000:3000"
+    networks:
+      - app_network
+    command: npm run start
+
+volumes:
+  postgres_data:
+
+networks:
+  app_network:
+    driver: bridge
