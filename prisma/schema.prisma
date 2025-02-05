@@ -8,8 +8,52 @@ generator client {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
+  id        String   @id @default(uuid())
+  username  String   @unique
   email     String   @unique
+  phone     String?
+  password  String
+  role      Int      @default(3)
   createdAt DateTime @default(now())
+  
+  // Relation
+
+  profile Profile?
+  leaderBoard Leaderboard?
+  notifications Notification[]
+}
+
+model Profile {
+  id String @id @default(uuid())
+  userId String @unique
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Leaderboard{
+  id String @id @default(uuid())
+  total_points Int @default(0)
+  rank Int @default(0)
+  student_id String @unique
+
+  student User @relation(fields: [student_id], references: [id])
+}
+
+model Notification{
+  id String @id @default(uuid())
+  user_id String
+  message String
+  type Int
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id])
+}
+
+model Progress{
+  id String @id @default(uuid())
+  student_id String
+  attendeces Int @default(0)
+  assignments_scores Int @default(0)
+  quizes_score Int @default(0)
+  total_points Int @default(0)
 }
