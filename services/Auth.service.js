@@ -10,12 +10,6 @@ class AuthService{
     static async createUser(user){
 
         try{
-            const { error } = signUpSchema.validate(user, {abortEarly: false});
-    
-            if (error) {
-                throw new Error(error.message)
-            }
-    
             const existingUser = await this.dao.getUserByEmail(user.email);
     
             if (existingUser){

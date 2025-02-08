@@ -60,7 +60,7 @@ class UserDAO{
         }
     }
 
-    async deleteUSer(userId){
+    async deleteUser(userId){
         try {
 
             await prisma.user.delete({
