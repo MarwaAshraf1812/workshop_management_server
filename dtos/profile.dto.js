@@ -14,3 +14,5 @@ class ProfileDTO {
         }
     }
 }
+
+module.exports = ProfileDTO
