@@ -1,13 +1,13 @@
 const ProfileDTO = require("../dtos/profile.dto");
 const ProfileService = require("../services/Profile.service");
-const { profileValidSchema } = require("../validations/profile.validation");
+const { profileValidSchema, updateProfileValidSchema } = require("../validations/profile.validation");
 
 class ProfileController {
 
     static async getProfile(req, res){
 
         try {
-            const profile = await ProfileService.getProfile(req.params.id)
+            const profile = await ProfileService.getProfile(req.params.email)
             return res.status(200).json(ProfileDTO.toResponse(profile))
         }
         catch (error) {
@@ -19,13 +19,14 @@ class ProfileController {
     static async createProfile(req, res){
 
         try{
+            const {email} = req.params;
             const {error} = profileValidSchema.validate(req.body, {abortEarly: false});
 
             if (error){
                 return res.status(400).json({error: error.details[0].message});
             }
 
-            const profile = await ProfileService.createProfile(ProfileDTO.fromRequest(req.body));
+            const profile = await ProfileService.createProfile(email, ProfileDTO.fromRequest(req.body));
             return res.status(201).json(ProfileDTO.toResponse(profile));
         }
         catch(err){
@@ -36,13 +37,14 @@ class ProfileController {
 
     static async updateProfile(req, res){
         try{
-            const {error} = profileValidSchema.validate(req.body, {abortEarly: false});
+            const {email} = req.params;
+            
+            const {error} = updateProfileValidSchema.validate(req.body, {abortEarly: false});
             if (error){
                 return res.status(400).json({error: error.details[0].message});
             }
             
-            const {userId, ...edits} = ProfileDTO.fromRequest(req.body);
-            const updatedProfile = await ProfileService.updateProfile(userId, edits);
+            const updatedProfile = await ProfileService.updateProfile(email, ProfileDTO.fromRequest(req.body));
 
             return res.status(200).json(ProfileDTO.toResponse(updatedProfile))
         }
