@@ -70,6 +70,22 @@ class ProfileDAO{
         }
     }
 
+    static async getProfile(userId){
+        try {
+            const profile = await prisma.profile.findUnique({
+                where: {user_id: userId},
+            })
+
+            return profile;
+        }
+        catch(err){
+            throw new Error(err.message);
+        }
+        finally{
+            await prisma.$disconnect();
+        }
+    }
+
 }
 
 module.exports = ProfileDAO

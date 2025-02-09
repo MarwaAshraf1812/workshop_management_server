@@ -3,22 +3,16 @@ const UserDAO = require("../daos/User.dao");
 
 class ProfileService {
 
-    static async createProfile(email, profile_data){
+    static async createProfile(id, profile_data){
         
         try {
 
-            if (! await UserDAO.checkEmailExists(email)){
-                throw new Error("Email does not exist");
-            }
-
-            const user = await UserDAO.getUserByEmail(email);
-
-            if (! await ProfileDAO.checkEmailExists(user.id)){
+            if (! await ProfileDAO.checkExistingProfile(user.id)){
                 throw new Error("User already has a profile");
             }
 
             const profile = await ProfileDAO.createProfile({
-                user_id: user.id,
+                user_id: id,
                 ...profile_data
             });
 
@@ -30,19 +24,14 @@ class ProfileService {
 
     }
 
-    static async updateProfile(email, edits){
+    static async updateProfile(id, edits){
         try{
-            if (!await UserDAO.checkEmailExists(email)){
-                throw new Error("Email does not exist");
-            }
 
-            const user = await UserDAO.getUserByEmail(email);
-
-            if (!await ProfileDAO.checkExistingProfile(user.id)){
+            if (!await ProfileDAO.checkExistingProfile(id)){
                 throw new Error("User does not have a profile");
             }
 
-            const updatedProfile = await ProfileDAO.updateProfile(user.id, edits);
+            const updatedProfile = await ProfileDAO.updateProfile(id, edits);
 
             return updatedProfile;
 
@@ -51,9 +40,9 @@ class ProfileService {
         }
     }
 
-    static async getProfile(email){
+    static async getProfile(id){
         try{
-            const profile = await ProfileDAO.getUserProfileUsingEmail(email);
+            const profile = await ProfileDAO.getProfile(id);
             return profile;
         }
         catch(err){

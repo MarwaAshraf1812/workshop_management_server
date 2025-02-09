@@ -7,7 +7,7 @@ class ProfileController {
     static async getProfile(req, res){
 
         try {
-            const profile = await ProfileService.getProfile(req.params.email)
+            const profile = await ProfileService.getProfile(req.params.id)
             return res.status(200).json(ProfileDTO.toResponse(profile))
         }
         catch (error) {
@@ -19,14 +19,14 @@ class ProfileController {
     static async createProfile(req, res){
 
         try{
-            const {email} = req.params;
+            const {id} = req.params;
             const {error} = profileValidSchema.validate(req.body, {abortEarly: false});
 
             if (error){
                 return res.status(400).json({error: error.details[0].message});
             }
 
-            const profile = await ProfileService.createProfile(email, ProfileDTO.fromRequest(req.body));
+            const profile = await ProfileService.createProfile(id, ProfileDTO.fromRequest(req.body));
             return res.status(201).json(ProfileDTO.toResponse(profile));
         }
         catch(err){
@@ -37,14 +37,14 @@ class ProfileController {
 
     static async updateProfile(req, res){
         try{
-            const {email} = req.params;
+            const {id} = req.params;
             
             const {error} = updateProfileValidSchema.validate(req.body, {abortEarly: false});
             if (error){
                 return res.status(400).json({error: error.details[0].message});
             }
             
-            const updatedProfile = await ProfileService.updateProfile(email, ProfileDTO.fromRequest(req.body));
+            const updatedProfile = await ProfileService.updateProfile(id, ProfileDTO.fromRequest(req.body));
 
             return res.status(200).json(ProfileDTO.toResponse(updatedProfile))
         }
