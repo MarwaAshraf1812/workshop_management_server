@@ -40,6 +40,17 @@ class ProfileDAO{
 
     }
 
+    static async checkExistingProfile(userId){
+        try {
+            const profile = await prisma.profile.findUnique({
+                where: {user_id: userId}
+            })
+            return profile
+        } catch(err){
+            throw new Error(err.message)
+        }
+    }
+
 }
 
 module.exports = ProfileDAO
