@@ -49,6 +49,9 @@ class ProfileDAO{
         } catch(err){
             throw new Error(err.message)
         }
+        finally{
+            await prisma.$disconnect()
+        }
     }
 
 }
