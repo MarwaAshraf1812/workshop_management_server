@@ -11,6 +11,7 @@ class userDTO {
         return {
             username: userData.username,
             email: userData.email,
+            role: userData.role
         };
     }
 }

@@ -1,5 +1,7 @@
 const express = require('express');
 const { Pool } = require('pg');
+const bodyParser = require('body-parser')
+
 require('dotenv').config();
 
 
@@ -9,6 +11,11 @@ const app = express();
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
+
+app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true })); 
+app.use(bodyParser.json());
+
 
 app.get('/', (req, res) => {
   res.send('Hello, World!');

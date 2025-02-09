@@ -1,24 +1,22 @@
 const UserDAO = require("../daos/User.dao")
 const crypto = require('crypto-js')
 const jwt = require('jsonwebtoken');
-const { signUpSchema } = require("../validations/user.validation");
+
 
 class AuthService{
-    
-    dao = new UserDAO();
 
     static async createUser(user){
 
         try{
-            const existingUser = await this.dao.getUserByEmail(user.email);
+            const existingUser = await UserDAO.checkEmailExists(user.email);
     
             if (existingUser){
-                throw new Error("Email is used")
+                throw new Error("Email is used");
             }
     
-            const createdUser = await this.dao.createUser(user);
+            const createdUser = await UserDAO.createUser(user);
             
-            return createdUser()
+            return createdUser;
             
         } catch (err){
             console.error(err);
@@ -30,13 +28,13 @@ class AuthService{
 
         try{
 
-            const user = await this.dao.getUserByEmail(email);
+            const user = await UserDAO.getUserByEmail(email);
 
             if (!user){
                 throw new Error("User doesn't exits")
             }
 
-            const originalPass = crypto.AES.decrypt(user.password, process.env.PASSWORD_HASH);
+            const originalPass = crypto.AES.decrypt(user.password, process.env.PASSWORD_HASH).toString(crypto.enc.Utf8);
 
             if (originalPass != password){
                 throw new Error("Invalid password");
@@ -45,7 +43,7 @@ class AuthService{
             const accessToken = jwt.sign({
                 id: user.id,
                 role: user.role
-            })
+            }, process.env.JWT_KEY)
 
             return {accessToken, user}
 
