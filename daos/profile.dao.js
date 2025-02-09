@@ -54,6 +54,22 @@ class ProfileDAO{
         }
     }
 
+    static async getUserProfileUsingEmail(email){
+        try {
+            const user = await prisma.user.findUnique({
+                where: { email: email },
+                include: {profile: true}
+            })
+
+            return user;
+        } catch(err){
+            throw new Error(err.message)
+        }
+        finally{
+            await prisma.$disconnect()
+        }
+    }
+
 }
 
 module.exports = ProfileDAO
