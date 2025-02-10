@@ -165,4 +165,6 @@ enum MaterialType {
   VIDEO
   PTX
   DOC
+  PDF
+  SLIDES
 }
