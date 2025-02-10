@@ -64,6 +64,23 @@ class SubmissionDAO {
         }
     }
 
+    static async updateSubmission(id, edits){
+        try {
+            const submission = await prisma.submission.update({
+                where: {id: id},
+                data: edits,
+            })
+
+            return submission;
+        }
+        catch(err){
+            throw new Error(err.message);
+        }
+        finally{
+            await prisma.$disconnect();
+        }
+    }
+
 }
 
 module.exports = SubmissionDAO;
