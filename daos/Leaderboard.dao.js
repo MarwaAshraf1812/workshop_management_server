@@ -2,7 +2,7 @@ const { PrismaClient } = require("@prisma/client")
 
 const prisma = new PrismaClient();
 
-class Leaderboard {
+class LeaderboardDAO {
 
     static async getLeaderboard(studentId){
         try {
@@ -78,4 +78,4 @@ class Leaderboard {
 
 }
 
-module.exports = Leaderboard
+module.exports = LeaderboardDAO
