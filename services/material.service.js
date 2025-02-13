@@ -1,4 +1,4 @@
-const MaterialDAO = require('../dao/material.dao');
+const MaterialDAO = require('../daos/material.dao');
 const {MaterialValidator, MaterialValidation} = require('../validations/material.validation');
 const { MaterialDTO} = require('../dtos/material.dto');
 

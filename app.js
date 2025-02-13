@@ -1,15 +1,10 @@
-const express = require('express');
-const { Pool } = require('pg');
-require('dotenv').config();
-
 const MaterialRouter = require('./routes/material.routes');
 const WorkshopRouter = require('./routes/workshop.routes');
+require('dotenv').config();
 
+const express = require('express');
 const app = express();
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

@@ -1,11 +1,11 @@
-export class WorkshopValidation extends Error {
+class WorkshopValidation extends Error {
   constructor(errors) {
     super('Workshop validation failed');
     this.errors = errors;
   }
 }
 
-export class WorkshopValidator {
+class WorkshopValidator {
   static validate(data) {
     const errors = [];
 
@@ -34,3 +34,5 @@ export class WorkshopValidator {
       }
   }
 }
+
+module.exports = { WorkshopValidator, WorkshopValidation };

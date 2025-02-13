@@ -2,7 +2,6 @@ const WorkshopDAO = require('../daos/workshop.dao');
 const { WorkshopDTO } = require('../dtos/workshop.dto');
 const { WorkshopUsersDTO } = require('../dtos/workshopUser.dto');
 const { WorkshopValidator, WorkshopValidation } = require('../validations/workshop.validation');
-const { WorkshopError } = require('../errors/workshop.error');
 
 class WorkshopService {
   async createWorkshop(workshopData) {

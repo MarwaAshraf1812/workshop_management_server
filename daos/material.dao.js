@@ -1,4 +1,4 @@
-import prisma from "../config/prisma";
+const prisma = require("../config/prisma");
 
 class MaterialDAO {
   async uploadMaterial({ MaterialData }) {
