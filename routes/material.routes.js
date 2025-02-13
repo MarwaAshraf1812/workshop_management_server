@@ -2,6 +2,7 @@
 const express = require("express");
 // const multer = require("multer");
 const MaterialController = require('../controllers/material.controller');
+const Authorization = require('../middlewares/Auth.middleware');
 
 const router = express.Router();
 

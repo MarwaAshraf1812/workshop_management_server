@@ -11,22 +11,22 @@ model User {
   id        String   @id @default(uuid())
   username  String   @unique
   email     String   @unique @db.VarChar(255)
-  phone     String?  @db.VarChar(20) 
+  phone     String?  @db.VarChar(20)
   password  String
-  role      Int      @default(3)
+  role      Role     @default(STUDENT)
   createdAt DateTime @default(now())
-  
+
   // Relations
-  profile Profile?
-  leaderBoard LeaderBoard?
-  progress Progress[]
+  profile       Profile?
+  leaderBoard   LeaderBoard?
+  progress      Progress[]
   notifications Notification[]
   workshopUsers workshop_users[]
-  submissions Submission[]
+  submissions   Submission[]
 }
 
 model Profile {
-  user_id    String @id
+  user_id   String @id
   firstName String @db.VarChar(200)
   lastName  String @db.VarChar(200)
   user      User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
@@ -34,35 +34,35 @@ model Profile {
   @@index([user_id])
 }
 
-model LeaderBoard{
-  id String @id @default(uuid())
-  total_points Int @default(0)
-  rank Int @default(0)
-  student_id String @unique
+model LeaderBoard {
+  id           String @id @default(uuid())
+  total_points Int    @default(0)
+  rank         Int    @default(0)
+  student_id   String @unique
 
   student User @relation(fields: [student_id], references: [id], onDelete: Cascade)
 }
 
-model Notification{
-  id String @id @default(uuid())
-  user_id String
-  message String
-  type Int
+model Notification {
+  id         String   @id @default(uuid())
+  user_id    String
+  message    String
+  type       Int
   created_at DateTime @default(now())
 
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model Progress {
-  id String @id @default(uuid())
-  student_id String
-  workshop_id String
-  attendances Int @default(0)
-  assignments_scores Decimal @db.Decimal(5,2) @default(0)
-  quizes_score Decimal @db.Decimal(5,2) @default(0)
-  total_points Int @default(0)
+  id                 String  @id @default(uuid())
+  student_id         String
+  workshop_id        String
+  attendances        Int     @default(0)
+  assignments_scores Decimal @default(0) @db.Decimal(5, 2)
+  quizes_score       Decimal @default(0) @db.Decimal(5, 2)
+  total_points       Int     @default(0)
 
-  student User @relation(fields: [student_id], references: [id], onDelete: Cascade)
+  student  User     @relation(fields: [student_id], references: [id], onDelete: Cascade)
   workshop Workshop @relation(fields: [workshop_id], references: [id], onDelete: Cascade)
 
   @@index([student_id])
@@ -70,44 +70,43 @@ model Progress {
 }
 
 model Workshop {
-  id String @id @default(uuid())
-  title String @db.VarChar(100)
-  description String @db.Text
-  start_date DateTime
-  end_date DateTime
-  online Boolean @default(false)
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now())
+  id          String   @id @default(uuid())
+  title       String   @db.VarChar(100)
+  description String   @db.Text
+  start_date  DateTime
+  end_date    DateTime
+  online      Boolean  @default(false)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now())
 
   // Relations
-  Materials Material[]
-  quizzes Quiz[]
-  assignments Assignment[]
+  Materials      Material[]
+  quizzes        Quiz[]
+  assignments    Assignment[]
   workshop_users workshop_users[]
-  progress Progress[]
-
+  progress       Progress[]
 }
 
 model workshop_users {
   workshop_id String
-  user_id String
-  created_at DateTime @default(now())
-
-  // Composite unique constraint
-  @@unique([workshop_id, user_id])
+  user_id     String
+  created_at  DateTime @default(now())
 
   // Relations
   workshop Workshop @relation(fields: [workshop_id], references: [id])
-  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  // Composite unique constraint
+  @@unique([workshop_id, user_id])
 }
 
 model Material {
-  id String @id @default(uuid())
-  title String @db.VarChar(100)
-  file_url Json
-  workshop_id String
+  id            String       @id @default(uuid())
+  title         String       @db.VarChar(100)
+  file_url      Json
+  workshop_id   String
   material_type MaterialType @default(PTX)
-  created_at DateTime @default(now())
+  created_at    DateTime     @default(now())
 
   // Relations
   workshop Workshop @relation(fields: [workshop_id], references: [id])
@@ -119,10 +118,10 @@ model Quiz {
   deadline     DateTime
   workshop_id  String
   created_at   DateTime @default(now())
-  total_points Int @default(0)
+  total_points Int      @default(0)
   quiz_link    String
 
-  workshop    Workshop     @relation(fields: [workshop_id], references: [id], onDelete: Cascade)
+  workshop Workshop @relation(fields: [workshop_id], references: [id], onDelete: Cascade)
 
   @@index([workshop_id])
   @@index([deadline])
@@ -130,28 +129,27 @@ model Quiz {
 }
 
 model Assignment {
-  id String @id @default(uuid())
-  title String @db.VarChar(100)
-  description String @db.Text
-  deadline DateTime
-  workshop_id String
-  created_at DateTime @default(now())
-  total_points Int @default(0)
+  id              String   @id @default(uuid())
+  title           String   @db.VarChar(100)
+  description     String   @db.Text
+  deadline        DateTime
+  workshop_id     String
+  created_at      DateTime @default(now())
+  total_points    Int      @default(0)
   assignment_link String
 
-  
   // Relations
-  workshop Workshop @relation(fields: [workshop_id], references: [id])
+  workshop    Workshop     @relation(fields: [workshop_id], references: [id])
   submissions Submission[]
 }
 
 model Submission {
-  id            String        @id @default(uuid())
-  student_id    String
-  assignment_id String?
-  assignment_link String?        @db.VarChar(255)
-  submitted_at  DateTime      @default(now())
-  feedback      String?       @db.Text
+  id              String   @id @default(uuid())
+  student_id      String
+  assignment_id   String?
+  assignment_link String?  @db.VarChar(255)
+  submitted_at    DateTime @default(now())
+  feedback        String?  @db.Text
 
   student    User        @relation(fields: [student_id], references: [id], onDelete: Cascade)
   assignment Assignment? @relation(fields: [assignment_id], references: [id], onDelete: SetNull)
@@ -167,4 +165,11 @@ enum MaterialType {
   DOC
   PDF
   SLIDES
+}
+
+enum Role {
+  ADMIN
+  MODERATOR
+  INSTRUCTOR
+  STUDENT
 }
