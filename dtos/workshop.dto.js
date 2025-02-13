@@ -1,6 +1,6 @@
 const { WorkshopValidator } = require('../validations/workshop.validation');
 
-export class WorkshopDTO {
+class WorkshopDTO {
   constructor({ id, title, description, start_date, end_date, online, created_at, updated_at }) {
     this.id = id;
     this.title = title;
@@ -49,3 +49,4 @@ export class WorkshopDTO {
     }));
   }
 }
+module.exports = WorkshopDTO;

@@ -1,4 +1,4 @@
-const WorkshopService = new (require('../services/workshop.service'))();
+const WorkshopService = require('../services/workshop.service');
 const { WorkshopDTO } = require('../dtos/workshop.dto');
 const { WorkshopUsersDTO } = require('../dtos/workshopUser.dto');
 
