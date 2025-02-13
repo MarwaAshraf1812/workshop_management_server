@@ -1,4 +1,4 @@
-import ROLE from "../utils/UserRole";
+const ROLE = require("../utils/UserRole");
 
 const jwt = require("jsonwebtoken")
 
@@ -68,4 +68,4 @@ class Authorization {
 
 }
 
-export default Authorization;
+module.exports = Authorization;

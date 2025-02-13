@@ -1,5 +1,6 @@
 const MaterialRouter = require('./routes/material.routes');
 const WorkshopRouter = require('./routes/workshop.routes');
+const userRouter = require('./routes/user.routes')
 require('dotenv').config();
 
 const express = require('express');
@@ -10,7 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/workshop/materials', MaterialRouter);
-app.use('/api/workshops', WorkshopRouter);
+app.use('/api/workshop', WorkshopRouter);
 
 app.use('/auth', userRouter)
 
