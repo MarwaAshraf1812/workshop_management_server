@@ -1,7 +1,6 @@
 const userRouter = require('./routes/user.routes')
 const MaterialRouter = require('./routes/material.routes');
 const WorkshopRouter = require('./routes/workshop.routes');
-const userRouter = require('./routes/user.routes')
 
 const express = require('express');
 const bodyParser = require('body-parser')
