@@ -12,6 +12,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/workshop/materials', MaterialRouter);
 app.use('/api/workshops', WorkshopRouter);
 
+app.use('/auth', userRouter)
+
 app.listen(process.env.PORT || 5000, () => {
   console.log(`Server is running on port ${process.env.PORT || 5000}`);
 });
