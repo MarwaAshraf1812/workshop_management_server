@@ -1,6 +1,6 @@
-const { MaterialValidator } = rquire('../validations/material.validation');
+const { MaterialValidator } = require('../validations/material.validation');
 
-export class MaterialDTO {
+class MaterialDTO {
   constructor({id, title, file_url, workshop_id, material_type, created_at}) {
     this.id = id;
     this.title = title;
@@ -43,3 +43,5 @@ export class MaterialDTO {
     }));
   }
 }
+
+module.exports = { MaterialDTO };

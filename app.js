@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const express = require('express');
 const { Pool } = require('pg');
 const bodyParser = require('body-parser')
@@ -11,12 +12,15 @@ const userRouter = require('./routes/user.routes')
 const MaterialRouter = require('./routes/material.routes');
 const WorkshopRouter = require('./routes/workshop.routes');
 >>>>>>> 0f207c9 (feat: implemen material management endpoints)
+=======
+const MaterialRouter = require('./routes/material.routes');
+const WorkshopRouter = require('./routes/workshop.routes');
+require('dotenv').config();
+>>>>>>> 6725937 (fix: fix some imports issues)
 
+const express = require('express');
 const app = express();
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
 
 app.use(express.json());
 <<<<<<< HEAD

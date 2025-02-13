@@ -1,4 +1,4 @@
-export class WorkshopUsersDTO {
+class WorkshopUsersDTO {
   constructor({ workshop_id, user_id }) {
     this.workshop_id = workshop_id;
     this.user_id = user_id;
@@ -25,3 +25,5 @@ export class WorkshopUsersDTO {
     }));
   }
 }
+
+module.exports = { WorkshopUsersDTO };

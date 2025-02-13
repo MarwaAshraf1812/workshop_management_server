@@ -1,11 +1,11 @@
-export class MaterialValidation extends Error {
+class MaterialValidation extends Error {
   constructor(errors) {
     super('Material validation failed');
     this.errors = errors;
   }
 }
 
-export class MaterialValidator {
+class MaterialValidator {
   static validate(data) {
     const errors = [];
 
@@ -26,3 +26,5 @@ export class MaterialValidator {
     }
   }
 }
+
+module.exports = { MaterialValidator, MaterialValidation };
