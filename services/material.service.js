@@ -1,4 +1,5 @@
 const MaterialDAO = require('../daos/material.dao');
+// const NotificationDAO = require("../daos/notification.dao");
 const {MaterialValidator, MaterialValidation} = require('../validations/material.validation');
 const { MaterialDTO} = require('../dtos/material.dto');
 
@@ -7,6 +8,10 @@ class MaterialService {
     try {
       MaterialValidator.validate(data);
       const material = await MaterialDAO.uploadMaterial({ MaterialData: data });
+
+      // await NotificationDAO.createNotification({
+      //   message: `Material ${material.name} uploaded successfully`,
+      // })
       return MaterialDTO.fromDatabase(material);
     } catch (error) {
       if (error instanceof MaterialValidation) {
