@@ -1,6 +1,6 @@
 const express = require('express');
 const WorkshopController = require('../controllers/workshop.controller');
-const authMiddleware = require('../middlewares/Auth.middleware');
+const {adminAuthorization, instructorAuthorization, moderatorAuthorization} = require('../middlewares/Auth.middleware');
 const validateUUIDMiddleware = require('../middlewares/validateUUID.middleware');
 
 const router = express.Router();
@@ -8,26 +8,26 @@ const router = express.Router();
 // ✅ Workshop management
 router
   .route('/')
-  .post(authMiddleware, WorkshopController.createWorkshop)
-  .get(WorkshopController.getAllWorkshops);
+  .post(adminAuthorization, WorkshopController.createWorkshop)
+  .get(adminAuthorization, moderatorAuthorization, instructorAuthorization, WorkshopController.getAllWorkshops);
 
 router
   .route('/:id')
   .all(validateUUIDMiddleware)
-  .get(WorkshopController.getWorkshopById)
-  .put(authMiddleware, WorkshopController.updateWorkshop)
-  .delete(authMiddleware, WorkshopController.deleteWorkshop);
+  .get(instructorAuthorization,  WorkshopController.getWorkshopById)
+  .put(adminAuthorization, moderatorAuthorization, instructorAuthorization, WorkshopController.updateWorkshop)
+  .delete(adminAuthorization, moderatorAuthorization, WorkshopController.deleteWorkshop);
 
 // ✅ Workshop user management
 router
   .route('/:id/users')
-  .all(authMiddleware, validateUUIDMiddleware)
+  .all(adminAuthorization, validateUUIDMiddleware)
   .post(WorkshopController.addUserToWorkshop)
   .get(WorkshopController.getWorkshopUsers);
 
 router.delete(
   '/:id/users/:userId',
-  authMiddleware,
+  adminAuthorization,
   validateUUIDMiddleware,
   WorkshopController.removeUserFromWorkshop
 );
