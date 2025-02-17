@@ -35,7 +35,7 @@ class AuthService{
                 throw new Error("User doesn't exits")
             }
 
-            const originalPass = crypto.AES.decrypt(user.password, process.env.PASSWORD_HASH).toString(crypto.enc.Utf8);
+            const originalPass = crypt.AES.decrypt(user.password, process.env.PASSWORD_HASH).toString(crypt.enc.Utf8);
 
             if (originalPass != password){
                 throw new Error("Invalid password");
