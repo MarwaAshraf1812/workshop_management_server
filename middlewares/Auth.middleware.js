@@ -23,7 +23,7 @@ class Authorization {
     static userAuthorization(req, res, next){
         this.verifyToken(req, res, ()=>{
 
-            if (req.user.id == req.params.id || req.user.role < ROLE.INSTRUCTOR){
+            if (req.user.id == req.params.id || req.user.role == ROLE.ADMIN){
                 next();
             }
             else {
@@ -35,7 +35,7 @@ class Authorization {
 
     static instructorAuthorization(req, res, next){
         this.verifyToken(req, res, ()=>{
-            if (req.user.role <= ROLE.INSTRUCTOR){
+            if (req.user.role <= ROLE.INSTRUCTOR || req.user.role == ROLE.ADMIN){
                 next();
             }
             else{
@@ -46,7 +46,7 @@ class Authorization {
 
     static moderatorAuthorization(req, res, next){
         this.verifyToken(req, res, ()=>{
-            if (req.user.role <= ROLE.MODERATOR){
+            if (req.user.role <= ROLE.MODERATOR || req.user.role == ROLE.ADMIN){
                 next();
             }
             else{
@@ -57,7 +57,7 @@ class Authorization {
 
     static adminAuthorization(req, res, next){
         this.verifyToken(req, res, ()=>{
-            if (req.user.role <= ROLE.ADMIN){
+            if (req.user.role <= ROLE.ADMIN || req.user.role == ROLE.ADMIN){
                 next();
             }
             else{
