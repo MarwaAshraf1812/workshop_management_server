@@ -1,6 +1,4 @@
 const { PrismaClient } = require("@prisma/client");
-const crypt = require('crypto-js');
-const e = require("express");
 
 const prisma = new PrismaClient()
 
@@ -10,15 +8,11 @@ class UserDAO{
 
         try{
 
-            console.log(user)
-
-            const encryptedPassword = crypt.AES.encrypt(user.password, process.env.PASSWORD_HASH);
-
             const createdUser = await prisma.user.create({
                 data: {
                     username: user.username,
                     email: user.email,
-                    password: encryptedPassword.toString(),
+                    password: user.password,
                 }
             })
 

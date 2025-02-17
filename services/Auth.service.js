@@ -1,5 +1,5 @@
 const UserDAO = require("../daos/User.dao")
-const crypto = require('crypto-js')
+const crypt = require('crypto-js');
 const jwt = require('jsonwebtoken');
 
 
@@ -14,6 +14,7 @@ class AuthService{
                 throw new Error("Email is used");
             }
     
+            user.password = crypt.AES.encrypt(user.password, process.env.PASSWORD_HASH).toString();
             const createdUser = await UserDAO.createUser(user);
             
             return createdUser;
