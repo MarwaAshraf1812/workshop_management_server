@@ -26,4 +26,4 @@ class WorkshopUsersDTO {
   }
 }
 
-module.exports = { WorkshopUsersDTO };
+module.exports = WorkshopUsersDTO;

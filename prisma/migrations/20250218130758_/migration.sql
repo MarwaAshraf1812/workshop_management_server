@@ -1,29 +1,21 @@
-/*
-  Warnings:
-
-  - The primary key for the `User` table will be changed. If it partially fails, the table could be left without primary key constraint.
-  - You are about to drop the column `name` on the `User` table. All the data in the column will be lost.
-  - You are about to alter the column `email` on the `User` table. The data in that column could be lost. The data in that column will be cast from `Text` to `VarChar(255)`.
-  - A unique constraint covering the columns `[username]` on the table `User` will be added. If there are existing duplicate values, this will fail.
-  - Added the required column `password` to the `User` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `username` to the `User` table without a default value. This is not possible if the table is not empty.
-
-*/
 -- CreateEnum
-CREATE TYPE "MaterialType" AS ENUM ('VIDEO', 'PTX', 'DOC');
+CREATE TYPE "MaterialType" AS ENUM ('VIDEO', 'PTX', 'DOC', 'PDF', 'SLIDES');
 
--- AlterTable
-ALTER TABLE "User" DROP CONSTRAINT "User_pkey",
-DROP COLUMN "name",
-ADD COLUMN     "password" TEXT NOT NULL,
-ADD COLUMN     "phone" VARCHAR(20),
-ADD COLUMN     "role" INTEGER NOT NULL DEFAULT 3,
-ADD COLUMN     "username" TEXT NOT NULL,
-ALTER COLUMN "id" DROP DEFAULT,
-ALTER COLUMN "id" SET DATA TYPE TEXT,
-ALTER COLUMN "email" SET DATA TYPE VARCHAR(255),
-ADD CONSTRAINT "User_pkey" PRIMARY KEY ("id");
-DROP SEQUENCE "User_id_seq";
+-- CreateEnum
+CREATE TYPE "Role" AS ENUM ('ADMIN', 'MODERATOR', 'INSTRUCTOR', 'STUDENT');
+
+-- CreateTable
+CREATE TABLE "User" (
+    "id" TEXT NOT NULL,
+    "username" TEXT NOT NULL,
+    "email" VARCHAR(255) NOT NULL,
+    "phone" VARCHAR(20),
+    "password" TEXT NOT NULL,
+    "role" "Role" NOT NULL DEFAULT 'STUDENT',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "Profile" (
@@ -141,6 +133,12 @@ CREATE TABLE "Submission" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
 CREATE INDEX "Profile_user_id_idx" ON "Profile"("user_id");
 
 -- CreateIndex
@@ -169,9 +167,6 @@ CREATE INDEX "Submission_student_id_idx" ON "Submission"("student_id");
 
 -- CreateIndex
 CREATE INDEX "Submission_assignment_id_idx" ON "Submission"("assignment_id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 
 -- AddForeignKey
 ALTER TABLE "Profile" ADD CONSTRAINT "Profile_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -13,7 +13,6 @@ class WorkshopDTO {
   }
 
   static fromRequest(body) {
-    WorkshopValidator.validate(body);
     return new WorkshopDTO({
       id: body.id,
       title: body.title,
@@ -21,7 +20,7 @@ class WorkshopDTO {
       start_date: body.start_date,
       end_date: body.end_date,
       online: body.online,
-    })
+    });
   }
 
   static fromDatabase(workshop) {
@@ -37,15 +36,18 @@ class WorkshopDTO {
     });
   }
 
-
   static fromDatabaseList(workshops) {
+    if (!Array.isArray(workshops)) {
+        console.error("Expected an array but got:", workshops);
+        return [];
+    }
     return workshops.map(workshop => new WorkshopDTO({
-      id: workshop.id,
-      title: workshop.title,
-      description: workshop.description,
-      start_date: workshop.start_date,
-      end_date: workshop.end_date,
-      online: workshop.online,
+        id: workshop.id,
+        title: workshop.title,
+        description: workshop.description,
+        start_date: workshop.start_date,
+        end_date: workshop.end_date,
+        online: workshop.online,
     }));
   }
 }

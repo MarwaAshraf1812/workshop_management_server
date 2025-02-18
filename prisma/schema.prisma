@@ -21,7 +21,7 @@ model User {
   leaderBoard   LeaderBoard?
   progress      Progress[]
   notifications Notification[]
-  workshopUsers workshop_users[]
+  workshopUsers workshopUsers[]
   submissions   Submission[]
 }
 
@@ -83,11 +83,11 @@ model Workshop {
   Materials      Material[]
   quizzes        Quiz[]
   assignments    Assignment[]
-  workshop_users workshop_users[]
+  workshop_users workshopUsers[]
   progress       Progress[]
 }
 
-model workshop_users {
+model workshopUsers {
   workshop_id String
   user_id     String
   created_at  DateTime @default(now())
