@@ -29,16 +29,16 @@ class WorkshopDAO {
     const skip = (page - 1) * limit;
     const [workshops, total] = await prisma.$transaction([
       prisma.workshop.findMany({
-        include: { 
-          Materials: true, 
-          quizzes: true, 
-          assignments: true, 
+        include: {
+          Materials: true,
+          quizzes: true,
+          assignments: true,
         },
         skip,
         take: limit,
-        orderBy: { created_at: 'desc' }
+        orderBy: { created_at: "desc" },
       }),
-      prisma.workshop.count()
+      prisma.workshop.count(),
     ]);
 
     return { workshops, total, page, limit };
@@ -55,11 +55,11 @@ class WorkshopDAO {
         workshop_users: {
           include: {
             user: {
-              include: { profile: true }
-            }
-          }
-        }
-      }
+              include: { profile: true },
+            },
+          },
+        },
+      },
     });
   }
 
@@ -79,7 +79,7 @@ class WorkshopDAO {
         },
       });
     });
-}
+  }
 
   async deleteWorkshop(workshopId) {
     return await prisma.workshop.delete({
@@ -88,7 +88,7 @@ class WorkshopDAO {
   }
 
   async getWorkshopUsers(workshopId, page = 1, limit = 10) {
-    page = Number(page) || 1; 
+    page = Number(page) || 1;
     limit = Number(limit) || 10;
     const skip = Math.max(0, (page - 1) * limit);
 
@@ -96,42 +96,68 @@ class WorkshopDAO {
       where: { workshop_id: workshopId },
       include: {
         user: {
-          include: { profile: true }
-        }
+          include: { profile: true },
+        },
       },
       skip: skip,
       take: limit,
-      orderBy: { created_at: 'desc' }
+      orderBy: { created_at: "desc" },
     });
   }
-  
+
   async addUserToWorkshop(workshopId, userId) {
-    return await prisma.$transaction(async (tx) => {
-      const existing = await tx.workshopUsers.findUnique({
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+      });
+      if (!user) {
+        throw new CustomError("User not found", 404);
+      }
+
+      const workshop = await prisma.workshop.findUnique({
+        where: { id: workshopId },
+      });
+      if (!workshop) {
+        throw new CustomError("Workshop not found", 404);
+      }
+
+      return await prisma.$transaction(async (tx) => {
+        return await tx.workshopUsers.create({
+          data: {
+            workshop_id: workshopId,
+            user_id: userId,
+          },
+          include: {
+            user: { include: { profile: true } },
+            workshop: true,
+          },
+        });
+      });
+    } catch (error) {
+      console.error("Error in addUserToWorkshop:", error);
+      throw error;
+    }
+  }
+
+  async removeUserFromWorkshop(workshopId, userId) {
+    try {
+      return await prisma.workshopUsers.delete({
         where: {
           workshop_id_user_id: {
             workshop_id: workshopId,
-            user_id: userId
-          }
-        }
-      });
-
-      if (existing) return existing;
-
-      return await tx.workshopUsers.create({
-        data: {
-          workshop_id: workshopId,
-          user_id: userId
+            user_id: userId,
+          },
         },
         include: {
-          user: {
-            include: { profile: true }
-          }
+          user: true,
+          workshop: true
         }
       });
-    });
+    } catch (error) {
+      console.error("Error in removeUserFromWorkshop DAO:", error);
+      throw error;
+    }
   }
-  
 
   async getUserWorkshops(userId, page = 1, limit = 10) {
     const skip = (page - 1) * limit;
@@ -142,15 +168,15 @@ class WorkshopDAO {
           include: {
             Materials: true,
             quizzes: true,
-            assignments: true
-          }
-        }
+            assignments: true,
+          },
+        },
       },
       skip,
       take: limit,
-      orderBy: { created_at: 'desc' }
+      orderBy: { created_at: "desc" },
     });
   }
 }
 
-module.exports = new  WorkshopDAO();
+module.exports = new WorkshopDAO();

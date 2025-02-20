@@ -4,7 +4,8 @@ const ROLES = {
   USER: 1,
   INSTRUCTOR: 2,
   MODERATOR: 3,
-  ADMIN: 4
+  ADMIN: 4,
+  STUDENT: 5
 };
 
 class Authorization {

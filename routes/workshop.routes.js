@@ -11,7 +11,6 @@ router
     Authorization.checkRoles(['INSTRUCTOR', 'MODERATOR', 'ADMIN']),
     WorkshopController.createWorkshop
   )
-  // Anyone can view all workshops
   .get(WorkshopController.getAllWorkshops);
 
 router
@@ -22,7 +21,6 @@ router
     Authorization.checkRoles(['ADMIN']),
     WorkshopController.updateWorkshop
   )
-  // Only admins can delete workshops
   .delete(
     Authorization.checkRoles(['ADMIN']),
     WorkshopController.deleteWorkshop
@@ -33,7 +31,7 @@ router
   .route('/:id/users')
   .all(validateUUIDMiddleware)
   .post(
-    Authorization.checkRoles(['ADMIN', 'INSTRUCTOR', 'MODERATOR']),
+    Authorization.checkRoles(['ADMIN', 'INSTRUCTOR', 'MODERATOR', 'STUDENT']),
     WorkshopController.addUserToWorkshop
   )
   .get(
@@ -42,10 +40,17 @@ router
   );
 
 router.delete(
-  '/:id/users/:userId',
+  '/:id/users/',
   Authorization.checkRoles(['INSTRUCTOR', 'MODERATOR', 'ADMIN']),
   validateUUIDMiddleware,
   WorkshopController.removeUserFromWorkshop
+);
+
+router.get(
+  '/:id/users/',
+  Authorization.checkRoles(['ADMIN', 'INSTRUCTOR', 'MODERATOR', 'STUDENT']),
+  validateUUIDMiddleware,
+  WorkshopController.getWorkshopUsers
 );
 
 module.exports = router;

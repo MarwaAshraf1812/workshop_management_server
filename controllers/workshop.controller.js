@@ -58,11 +58,16 @@ class WorkshopController {
 
   async addUserToWorkshop(req, res) {
     try {
-      if (!req.user || !req.user.id) {
-        res.status(401).json({ message: "Unauthorized" });
+      if (!req.user?.id) {
+        return res.status(401).json({ 
+          success: false,
+          message: "Unauthorized" 
+        });
       }
       const workshop = await WorkshopService.addUserToWorkshop(req.params.id, req.user.id);
-      res.status(201).json(workshop);
+      return res.status(201).json({
+        workshop
+      });
     } catch (error) {
       console.error("Error adding user to workshop:", error);
       res.status(500).send("Failed to add user to workshop");
@@ -71,9 +76,9 @@ class WorkshopController {
 
   async removeUserFromWorkshop(req, res) {
     try {
-      const { user_id } = req.body;
-      await WorkshopService.removeUserFromWorkshop(req.params.id, user_id);
-      res.status(204).send();
+      const { userId } = req.body;
+      const workshop = await WorkshopService.removeUserFromWorkshop(req.params.id, userId);
+      res.status(200).json({workshop});
     } catch (error) {
       console.error("Error removing user from workshop:", error);
       res.status(500).send("Failed to remove user from workshop");
@@ -93,10 +98,10 @@ class WorkshopController {
   async getUserWorkshops(req, res) {
     try {
       if (!req.user || !req.user.id) {
-        return res.status(401).json({ message: "Unauthorized" });
+        res.status(401).json({ message: "Unauthorized" });
       }
       const workshops = await WorkshopService.getUserWorkshops(req.user.id);
-      return res.status(200).json(workshops);
+      res.status(200).json(workshops);
     } catch (error) {
       console.error("Error retrieving user workshops:", error);
       res.status(500).send("Failed to retrieve user workshops");
