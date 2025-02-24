@@ -19,7 +19,7 @@ class MaterialService {
   async getMaterialsByWorkshopId(workshopId) {
     try {
       if (!workshopId) {
-        throw { status: 400, message: "Workshop ID is required" };
+        return { status: 400, message: "Workshop ID is required" };
       }
       const materials = await MaterialDAO.getMaterialsByWorkshopId(workshopId);
       return MaterialDTO.fromDatabaseList(materials);
@@ -31,8 +31,11 @@ class MaterialService {
 
   async deleteMaterial(materialId) {
     try {
-      await MaterialDAO.deleteMaterialById(materialId);
-      return { message: "Material deleted successfully" };
+        if (!materialId) {
+          throw new Error("Material ID is required");
+        }
+        return await MaterialDAO.deleteMaterialById(materialId);
+      
     } catch (error) {
       console.error("Error in deleteMaterial:", error);
       throw error;

@@ -12,7 +12,7 @@ class MaterialDAO {
     }
   }
 
-  async getMaterialsByWorkshopId({ workshopId }) {
+  async getMaterialsByWorkshopId({workshopId}) {
     try {
       return await prisma.material.findMany({
         where: {
@@ -25,24 +25,31 @@ class MaterialDAO {
     }
   }
 
-  async deleteMaterialById({ materialId }) {
+  async deleteMaterialById(materialId ) {
     try {
+      if (!materialId) {
+        throw new Error("Material ID is required");
+      }
+  
       const material = await prisma.material.findUnique({
-        where: { id: materialId },
+        where: { id: materialId }
       });
   
       if (!material) {
-        throw { status: 404, message: "Material not found" };
+        return {message: "Material not found"};
       }
   
-      return await prisma.material.delete({
-        where: { id: materialId },
+      await prisma.material.delete({
+        where: { id: materialId }
       });
+  
+      return { success: true, message: "Material deleted successfully" };
     } catch (error) {
-      console.error("Error deleting material by id:", error);
-      throw { status: 500, message: "Failed to delete material" };
+      console.error("Error deleting material:", error);
+      throw error;
     }
   }
+  
 }  
 
 module.exports = new MaterialDAO();
