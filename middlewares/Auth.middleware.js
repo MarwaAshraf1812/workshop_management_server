@@ -1,71 +1,145 @@
-const ROLE = require("../utils/UserRole");
+const jwt = require('jsonwebtoken');
 
-const jwt = require("jsonwebtoken")
+const ROLES = {
+  USER: 1,
+  INSTRUCTOR: 2,
+  MODERATOR: 3,
+  ADMIN: 4,
+  STUDENT: 5
+};
 
 class Authorization {
+  /**
+   * Verifies the JWT token from the request header
+   */
+  static verifyToken(req, res, next) {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader) {
+        return res.status(401).json({
+          success: false,
+          message: "No authentication token provided"
+        });
+      }
 
-    static verifyToken(req, res, next){
-        const token = req.headers.authorization;
-        if (!token){
-            return res.status(401).send("Not authanticated");
+      const token = authHeader.startsWith('Bearer ')
+        ? authHeader.slice(7)
+        : authHeader;
+
+      jwt.verify(token, process.env.JWT_KEY, (err, decoded) => {
+        if (err) {
+          console.log('Token verification error:', err.message);
+          return res.status(403).json({
+            success: false,
+            message: "Invalid or expired token"
+          });
         }
-        else{
-            jwt.verify(token, process.env.JWT_KEY, (err, user)=>{
-                if (err) {return res.status(403).send("Token is not valid")}
-                else{
-                    req.user = user;
-                    next();
-                }
-            })
+        
+        req.user = decoded;
+        next();
+      });
+    } catch (error) {
+      console.error('Auth error:', error);
+      return res.status(500).json({
+        success: false,
+        message: "Authentication error"
+      });
+    }
+  }
+
+  /**
+   * Checks if user has required role(s)
+   */
+  static checkRoles(allowedRoles) {
+    return (req, res, next) => {
+      Authorization.verifyToken(req, res, () => {
+        const userRole = req.user.role;
+        
+        if (!userRole) {
+          return res.status(403).json({
+            success: false,
+            message: "User role not found in token"
+          });
         }
-    }
 
-    static userAuthorization(req, res, next){
-        this.verifyToken(req, res, ()=>{
+        const hasPermission = allowedRoles.some(role => ROLES[userRole] >= ROLES[role]);
+        
+        if (!hasPermission) {
+          return res.status(403).json({
+            success: false,
+            message: "You don't have permission to perform this action"
+          });
+        }
 
-            if (req.user.id == req.params.id || req.user.role == ROLE.ADMIN){
-                next();
-            }
-            else {
-                res.status(403).send("Un authorized");
-            }
+        next();
+      });
+    };
+  }
 
-        })
-    }
+  /**
+   * Checks if user owns the resource or has admin rights
+   */
+  static checkOwnership(resourceIdField) {
+    return (req, res, next) => {
+      Authorization.verifyToken(req, res, () => {
+        const userId = req.user.id;
+        const resourceId = req.params[resourceIdField];
+        const userRole = req.user.role;
 
-    static instructorAuthorization(req, res, next){
-        this.verifyToken(req, res, ()=>{
-            if (req.user.role <= ROLE.INSTRUCTOR || req.user.role == ROLE.ADMIN){
-                next();
-            }
-            else{
-                res.status(403).send("Un authorized");
-            }
-        })
-    }
+        // Admins can access any resource
+        if (userRole >= ROLES.ADMIN) {
+          return next();
+        }
 
-    static moderatorAuthorization(req, res, next){
-        this.verifyToken(req, res, ()=>{
-            if (req.user.role <= ROLE.MODERATOR || req.user.role == ROLE.ADMIN){
-                next();
-            }
-            else{
-                res.status(403).send("Un authorized");
-            }
-        })
-    }
+        // Check if user owns the resource
+        if (userId === resourceId) {
+          return next();
+        }
 
-    static adminAuthorization(req, res, next){
-        this.verifyToken(req, res, ()=>{
-            if (req.user.role <= ROLE.ADMIN || req.user.role == ROLE.ADMIN){
-                next();
-            }
-            else{
-                res.status(403).send("Un authorized");
-            }
-        })
-    }
+        return res.status(403).json({
+          success: false,
+          message: "You don't have permission to access this resource"
+        });
+      });
+    };
+  }
 
+  /**
+   * Combined check for both role and ownership
+   */
+  static checkRoleAndOwnership(allowedRoles, resourceIdField) {
+    return (req, res, next) => {
+      Authorization.verifyToken(req, res, () => {
+        const userRole = req.user.role;
+        const userId = req.user.id;
+        const resourceId = req.params[resourceIdField];
+
+        // Check role first
+        const hasRole = allowedRoles.some(role => userRole >= ROLES[role]);
+        if (!hasRole) {
+          return res.status(403).json({
+            success: false,
+            message: "Insufficient permissions"
+          });
+        }
+
+        // If user has admin role, allow access
+        if (userRole >= ROLES.ADMIN) {
+          return next();
+        }
+
+        // Check ownership
+        if (userId === resourceId) {
+          return next();
+        }
+
+        return res.status(403).json({
+          success: false,
+          message: "You don't have permission to access this resource"
+        });
+      });
+    };
+  }
 }
 
-module.exports = Authorization;
+module.exports = { Authorization, ROLES };

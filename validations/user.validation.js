@@ -4,7 +4,7 @@ const signUpValidSchema = Joi.object({
     username: Joi.string().alphanum().min(1).max(45).required(),
     email: Joi.string().email().required(),
     password: Joi.string().min(8).required(),
-    confirmPassword: Joi.string().valid(Joi.ref('password')).required()
+    // confirmPassword: Joi.string().valid(Joi.ref('password')).required()
 })
 
 const loginValidSchema = Joi.object({

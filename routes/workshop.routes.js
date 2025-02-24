@@ -1,35 +1,56 @@
 const express = require('express');
 const WorkshopController = require('../controllers/workshop.controller');
-const {adminAuthorization, instructorAuthorization, moderatorAuthorization} = require('../middlewares/Auth.middleware');
+const { Authorization, ROLES } = require('../middlewares/Auth.middleware');
 const validateUUIDMiddleware = require('../middlewares/validateUUID.middleware');
-
 const router = express.Router();
 
 // ✅ Workshop management
 router
   .route('/')
-  .post(adminAuthorization, WorkshopController.createWorkshop)
-  .get(adminAuthorization, moderatorAuthorization, instructorAuthorization, WorkshopController.getAllWorkshops);
+  .post(
+    Authorization.checkRoles(['INSTRUCTOR', 'MODERATOR', 'ADMIN']),
+    WorkshopController.createWorkshop
+  )
+  .get(WorkshopController.getAllWorkshops);
 
 router
   .route('/:id')
   .all(validateUUIDMiddleware)
-  .get(instructorAuthorization,  WorkshopController.getWorkshopById)
-  .put(adminAuthorization, moderatorAuthorization, instructorAuthorization, WorkshopController.updateWorkshop)
-  .delete(adminAuthorization, moderatorAuthorization, WorkshopController.deleteWorkshop);
+  .get(WorkshopController.getWorkshopById)
+  .put(
+    Authorization.checkRoles(['ADMIN']),
+    WorkshopController.updateWorkshop
+  )
+  .delete(
+    Authorization.checkRoles(['ADMIN']),
+    WorkshopController.deleteWorkshop
+  );
 
 // ✅ Workshop user management
 router
   .route('/:id/users')
-  .all(adminAuthorization, validateUUIDMiddleware)
-  .post(WorkshopController.addUserToWorkshop)
-  .get(WorkshopController.getWorkshopUsers);
+  .all(validateUUIDMiddleware)
+  .post(
+    Authorization.checkRoles(['ADMIN', 'INSTRUCTOR', 'MODERATOR', 'STUDENT']),
+    WorkshopController.addUserToWorkshop
+  )
+  .get(
+    Authorization.checkRoles(['INSTRUCTOR', 'MODERATOR', 'ADMIN']),
+    WorkshopController.getWorkshopUsers
+  );
 
 router.delete(
-  '/:id/users/:userId',
-  adminAuthorization,
+  '/:id/users/',
+  Authorization.checkRoles(['MODERATOR', 'ADMIN']),
   validateUUIDMiddleware,
   WorkshopController.removeUserFromWorkshop
+);
+
+router.get(
+  '/:id/users/',
+  Authorization.checkRoles(['ADMIN', 'INSTRUCTOR', 'MODERATOR', 'STUDENT']),
+  validateUUIDMiddleware,
+  WorkshopController.getWorkshopUsers
 );
 
 module.exports = router;
