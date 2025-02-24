@@ -1,11 +1,29 @@
 const userRouter = require('./routes/user.routes')
 const MaterialRouter = require('./routes/material.routes');
 const WorkshopRouter = require('./routes/workshop.routes');
+const http = require("http");
+const { Server } = require("socket.io");
 
 const express = require('express');
+const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: "*" } });
+
 const bodyParser = require('body-parser')
 require('dotenv').config();
 const app = express();
+
+// Socket.io setup
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.id);
+
+  socket.on("notify", (data) => {
+    io.emit("notification", data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
+});
 
 
 app.use(express.json());
