@@ -105,7 +105,7 @@ model Material {
   title         String       @db.VarChar(100)
   file_url      Json
   workshop_id   String
-  material_type MaterialType @default(PTX)
+  material_type MaterialType @default(LINK)
   created_at    DateTime     @default(now())
 
   // Relations
@@ -165,6 +165,7 @@ enum MaterialType {
   DOC
   PDF
   SLIDES
+  LINK
 }
 
 enum Role {
