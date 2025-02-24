@@ -1,4 +1,5 @@
 const prisma = require("../config/prisma");
+const { PrismaClientKnownRequestError } = require("@prisma/client");
 
 class WorkshopDAO {
   async createWorkshop(workshopData) {
@@ -87,11 +88,25 @@ class WorkshopDAO {
     });
   }
 
+  async getWorkshopUser(workshopId, userId) {
+    return await prisma.workshopUsers.findUnique({
+      where: {
+        workshop_id_user_id: {
+          workshop_id: workshopId,
+          user_id: userId,
+        }
+      },
+      include: {
+        user: { include: { profile: true } },
+        workshop: true,
+      }
+    });
+  }
+
   async getWorkshopUsers(workshopId, page = 1, limit = 10) {
     page = Number(page) || 1;
     limit = Number(limit) || 10;
     const skip = Math.max(0, (page - 1) * limit);
-
     return await prisma.workshopUsers.findMany({
       where: { workshop_id: workshopId },
       include: {
@@ -107,32 +122,30 @@ class WorkshopDAO {
 
   async addUserToWorkshop(workshopId, userId) {
     try {
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-      });
-      if (!user) {
-        throw new CustomError("User not found", 404);
+      const existingUser = await this.getWorkshopUser(workshopId, userId);
+      
+      if (existingUser) {
+        return {
+          exists: true,
+          data: existingUser // Return the existing user data
+        };
       }
 
-      const workshop = await prisma.workshop.findUnique({
-        where: { id: workshopId },
+      const newUser = await prisma.workshopUsers.create({
+        data: {
+          workshop_id: workshopId,
+          user_id: userId,
+        },
+        include: {
+          user: { include: { profile: true } },
+          workshop: true,
+        },
       });
-      if (!workshop) {
-        throw new CustomError("Workshop not found", 404);
-      }
 
-      return await prisma.$transaction(async (tx) => {
-        return await tx.workshopUsers.create({
-          data: {
-            workshop_id: workshopId,
-            user_id: userId,
-          },
-          include: {
-            user: { include: { profile: true } },
-            workshop: true,
-          },
-        });
-      });
+      return {
+        exists: false,
+        data: newUser
+      };
     } catch (error) {
       console.error("Error in addUserToWorkshop:", error);
       throw error;
@@ -141,23 +154,36 @@ class WorkshopDAO {
 
   async removeUserFromWorkshop(workshopId, userId) {
     try {
-      return await prisma.workshopUsers.delete({
+      const existingUser = await prisma.workshopUsers.findUnique({
         where: {
           workshop_id_user_id: {
             workshop_id: workshopId,
             user_id: userId,
           },
         },
-        include: {
-          user: true,
-          workshop: true
-        }
       });
+  
+      if (!existingUser) {
+        throw new Error("User is not part of this workshop");
+      }
+
+      await prisma.workshopUsers.delete({
+        where: {
+          workshop_id_user_id: {
+            workshop_id: workshopId,
+            user_id: userId,
+          },
+        },
+      });
+
+      return { message: "User removed from the workshop successfully" };
     } catch (error) {
-      console.error("Error in removeUserFromWorkshop DAO:", error);
+      console.error("Error in removeUserFromWorkshop:", error);
       throw error;
     }
   }
+  
+  
 
   async getUserWorkshops(userId, page = 1, limit = 10) {
     const skip = (page - 1) * limit;

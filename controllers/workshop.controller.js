@@ -59,34 +59,86 @@ class WorkshopController {
   async addUserToWorkshop(req, res) {
     try {
       if (!req.user?.id) {
-        return res.status(401).json({ 
+        return res.status(401).json({
           success: false,
-          message: "Unauthorized" 
+          message: "Unauthorized"
         });
       }
-      const workshop = await WorkshopService.addUserToWorkshop(req.params.id, req.user.id);
-      return res.status(201).json({
-        workshop
-      });
+  
+      const result = await WorkshopService.addUserToWorkshop(
+        req.params.id,
+        req.user.id
+      );
+  
+      if (!result.success) {
+        return res.status(409).json(result);
+      }
+  
+      return res.status(201).json(result);
     } catch (error) {
-      console.error("Error adding user to workshop:", error);
-      res.status(500).send("Failed to add user to workshop");
+      console.error("Error in WorkshopController.addUserToWorkshop:", error);
+      
+      if (error.code === 'P2002') {
+        return res.status(409).json({
+          success: false,
+          message: "User is already in this workshop"
+        });
+      }
+  
+      return res.status(500).json({
+        success: false,
+        message: "Failed to add user to workshop"
+      });
     }
   }
-
   async removeUserFromWorkshop(req, res) {
     try {
-      const { userId } = req.body;
-      const workshop = await WorkshopService.removeUserFromWorkshop(req.params.id, userId);
-      res.status(200).json({workshop});
+      if (!req.user?.id) {
+        return res.status(401).json({
+          success: false,
+          message: "Unauthorized"
+        });
+      }
+
+      if (req.user.role !== 'ADMIN' && req.user.role !== 'MODERATOR') {
+        return res.status(403).json({
+          success: false,
+          message: "You don't have permission to remove users from this workshop"
+        });
+      }
+  
+      const result = await WorkshopService.removeUserFromWorkshop(
+        req.params.id,
+        req.body.userId
+      );
+
+      return res.status(200).json(result);
+
     } catch (error) {
       console.error("Error removing user from workshop:", error);
-      res.status(500).send("Failed to remove user from workshop");
+      
+      if (error.statusCode === 404) {
+        return res.status(404).json({
+          success: false,
+          message: error.message
+        });
+      }
+      return res.status(500).json({
+        success: false,
+        message: "Failed to remove user from workshop",
+        error: error.message
+      });
     }
   }
 
   async getWorkshopUsers(req, res) {
     try {
+      if (req.user.role !== 'ADMIN' && req.user.role !== 'MODERATOR') {
+        return res.status(403).json({
+          success: false,
+          message: "You don't have permission to remove users from this workshop"
+        });
+      }
       const workshopUsers = await WorkshopService.getWorkshopUsers(req.params.id);
       res.status(200).json(workshopUsers);
     } catch (error) {

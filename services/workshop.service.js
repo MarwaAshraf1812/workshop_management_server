@@ -80,43 +80,30 @@ class WorkshopService {
 
   async addUserToWorkshop(workshopId, userId) {
     try {
-
-      const user = await WorkshopDAO.getWorkshopUsers(workshopId, userId);
-      if (user) {
-        return { message: "User already exists in the workshop" };
-      }
-      const workshopUsers = await WorkshopDAO.addUserToWorkshop(workshopId, userId);
+      const result = await WorkshopDAO.addUserToWorkshop(workshopId, userId);
       
-      return WorkshopUsersDTO.fromDatabase(workshopUsers);
+      if (result.exists) {
+        return {
+          success: false,
+          message: "User is already in this workshop",
+          data: WorkshopUsersDTO.fromDatabase(result.data)
+        };
+      }
+
+      return {
+        success: true,
+        message: "User added successfully",
+        data: WorkshopUsersDTO.fromDatabase(result.data)
+      };
     } catch (error) {
-      console.error("Error adding user to workshop:", error);
+      console.error("Error in WorkshopService.addUserToWorkshop:", error);
       throw error;
     }
   }
 
-  async removeUserFromWorkshop(workshopId, userId, currentUserId) {
+  async removeUserFromWorkshop(workshopId, userId) {
     try {
-      // First check if the user exists in the workshop
-      const workshopUser = await WorkshopDAO.getWorkshopUsers(workshopId, userId);
-      
-      if (!workshopUser) {
-        throw new Error("User is not a member of this workshop", 404);
-      }
-
-      // Check if current user is admin or the same user
-      const currentUserWorkshop = await WorkshopDAO.getWorkshopUsers(workshopId, currentUserId);
-      
-      if (!currentUserWorkshop) {
-        throw new Error("You are not a member of this workshop", 403);
-      }
-
-      if (!currentUserWorkshop.role == 'ADMIN' && currentUserId !== userId) {
-        throw new Error("You don't have permission to remove other users", 403);
-      }
-
-      // Proceed with removal
-      const removedUser = await WorkshopDAO.removeUserFromWorkshop(workshopId, userId);
-      return WorkshopUsersDTO.fromDatabase(removedUser);
+      return await WorkshopDAO.removeUserFromWorkshop(workshopId, userId);
     } catch (error) {
       console.error("Error removing user from workshop:", error);
       throw error;

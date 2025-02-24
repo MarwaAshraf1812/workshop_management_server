@@ -41,7 +41,7 @@ router
 
 router.delete(
   '/:id/users/',
-  Authorization.checkRoles(['INSTRUCTOR', 'MODERATOR', 'ADMIN']),
+  Authorization.checkRoles(['MODERATOR', 'ADMIN']),
   validateUUIDMiddleware,
   WorkshopController.removeUserFromWorkshop
 );
