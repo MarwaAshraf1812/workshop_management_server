@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "MaterialType" AS ENUM ('VIDEO', 'PTX', 'DOC', 'PDF', 'SLIDES');
+CREATE TYPE "MaterialType" AS ENUM ('VIDEO', 'PTX', 'DOC', 'PDF', 'SLIDES', 'LINK');
 
 -- CreateEnum
 CREATE TYPE "Role" AS ENUM ('ADMIN', 'MODERATOR', 'INSTRUCTOR', 'STUDENT');
@@ -12,7 +12,7 @@ CREATE TABLE "User" (
     "phone" VARCHAR(20),
     "password" TEXT NOT NULL,
     "role" "Role" NOT NULL DEFAULT 'STUDENT',
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -39,9 +39,10 @@ CREATE TABLE "LeaderBoard" (
 -- CreateTable
 CREATE TABLE "Notification" (
     "id" TEXT NOT NULL,
-    "user_id" TEXT NOT NULL,
+    "user_id" TEXT,
     "message" TEXT NOT NULL,
-    "type" INTEGER NOT NULL,
+    "type" TEXT NOT NULL,
+    "read" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Notification_pkey" PRIMARY KEY ("id")
@@ -75,7 +76,7 @@ CREATE TABLE "Workshop" (
 );
 
 -- CreateTable
-CREATE TABLE "workshop_users" (
+CREATE TABLE "workshopUsers" (
     "workshop_id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -87,7 +88,7 @@ CREATE TABLE "Material" (
     "title" VARCHAR(100) NOT NULL,
     "file_url" JSONB NOT NULL,
     "workshop_id" TEXT NOT NULL,
-    "material_type" "MaterialType" NOT NULL DEFAULT 'PTX',
+    "material_type" "MaterialType" NOT NULL DEFAULT 'LINK',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Material_pkey" PRIMARY KEY ("id")
@@ -151,7 +152,7 @@ CREATE INDEX "Progress_student_id_idx" ON "Progress"("student_id");
 CREATE INDEX "Progress_workshop_id_idx" ON "Progress"("workshop_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "workshop_users_workshop_id_user_id_key" ON "workshop_users"("workshop_id", "user_id");
+CREATE UNIQUE INDEX "workshopUsers_workshop_id_user_id_key" ON "workshopUsers"("workshop_id", "user_id");
 
 -- CreateIndex
 CREATE INDEX "Quiz_workshop_id_idx" ON "Quiz"("workshop_id");
@@ -184,10 +185,10 @@ ALTER TABLE "Progress" ADD CONSTRAINT "Progress_student_id_fkey" FOREIGN KEY ("s
 ALTER TABLE "Progress" ADD CONSTRAINT "Progress_workshop_id_fkey" FOREIGN KEY ("workshop_id") REFERENCES "Workshop"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "workshop_users" ADD CONSTRAINT "workshop_users_workshop_id_fkey" FOREIGN KEY ("workshop_id") REFERENCES "Workshop"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "workshopUsers" ADD CONSTRAINT "workshopUsers_workshop_id_fkey" FOREIGN KEY ("workshop_id") REFERENCES "Workshop"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "workshop_users" ADD CONSTRAINT "workshop_users_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "workshopUsers" ADD CONSTRAINT "workshopUsers_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Material" ADD CONSTRAINT "Material_workshop_id_fkey" FOREIGN KEY ("workshop_id") REFERENCES "Workshop"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

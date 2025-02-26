@@ -1,5 +1,6 @@
 const MaterialDAO = require('../daos/material.dao');
-// const NotificationDAO = require("../daos/notification.dao");
+const NotificationDAO = require("../daos/notification.dao");
+const { getIo } = require('../config/socket');
 const {MaterialValidator, MaterialValidation} = require('../validations/material.validation');
 const { MaterialDTO} = require('../dtos/material.dto');
 

@@ -1,24 +1,24 @@
 const NotificationService = require("../services/notification.service");
+const NotificationValidator = require("../validations/notification.validator");
 
 class NotificationController {
+
   async sendNotification(req, res) {
     try {
-      const { message, userId, type } = req.body;
-      
+      const { error, value } = NotificationValidator.validateNotification(req.body);
 
-      if (!message) {
-        return res.status(400).json({ 
-          success: false, 
-          message: "Message is required" 
-        });
+      if (error) {
+        return res.status(400).json({ success: false, message: error.details[0].message });
       }
-    const notification = await NotificationService.sendNotification({ message, userId, type });
-    res.status(201).json({ success: true, notification });
+
+      const notification = await NotificationService.sendNotification(value);
+      res.status(201).json({ success: true, notification });
     } catch (error) {
       console.error("Error in sendNotification:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   }
+
 
   async sendNotificationToAll(req, res) {
     try {
@@ -42,6 +42,10 @@ class NotificationController {
 
   async getNotifications(req, res) {
     try {
+      if (!req.user || !req.user.id) {
+        return res.status(401).json({ success: false, message: "Unauthorized access" });
+      }
+  
       const userId = req.user.id;
       const { page, limit } = req.query;
       const notifications = await NotificationService.getNotifications(userId
@@ -59,7 +63,8 @@ class NotificationController {
   async markAsRead(req, res) {
     try {
       const { notificationId } = req.params;
-      const userId = req.user.id;
+      const userId = req.user?.id;
+      console.log("userId", req.user);
 
       if (!notificationId) {
         return res.status(400).json({ 
@@ -67,14 +72,26 @@ class NotificationController {
           message: "Notification ID is required" 
         });
       }
-      await NotificationService.markAsRead(notificationId, userId);
+
+      if (!userId) {
+        return res.status(401).json({ 
+          success: false, 
+          message: "Unauthorized access" 
+        });
+      }
+
+      const notification = await NotificationService.markAsRead(notificationId, userId);
+      if (!notification) {
+        return res.status(404).json({ success: false, message: "Notification not found" });
+      }
 
       res.status(200).json({ success: true, message: "Notification marked as read" });
     } catch (error) {
       console.error("Error in markAsRead:", error);
       res.status(500).json({ message: "Internal server error" });
     }
-  }
+}
+
 
   async markAllAsRead(req, res) {
     try {
