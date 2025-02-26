@@ -20,7 +20,7 @@ model User {
   profile       Profile?
   leaderBoard   LeaderBoard?
   progress      Progress[]
-  notifications Notification[]
+  notifications UserNotification[]
   workshopUsers workshopUsers[]
   submissions   Submission[]
 }
@@ -44,14 +44,25 @@ model LeaderBoard {
 }
 
 model Notification {
-  id         String   @id @default(uuid())
-  user_id    String?
-  message    String
+  id         String    @id @default(uuid())
+  message    String    @default("New Notification")
   type       String
-  read      Boolean @default(false)
-  created_at DateTime @default(now())
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?  @updatedAt
+  userNotifications UserNotification[]
+}
 
-  user User? @relation(fields: [user_id], references: [id], onDelete: Cascade)
+model UserNotification {
+  id             String   @id @default(uuid())
+  user_id         String
+  notification_id String
+  read           Boolean  @default(false)
+  updated_at      DateTime @updatedAt
+
+  user          User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  notification  Notification @relation(fields: [notification_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, notification_id])
 }
 
 model Progress {
