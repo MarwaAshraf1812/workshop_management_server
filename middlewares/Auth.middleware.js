@@ -26,18 +26,17 @@ const Authorization = {
         ? authHeader.slice(7)
         : authHeader;
 
-      jwt.verify(token, process.env.JWT_KEY, (err, decoded) => {
-        if (err) {
-          console.log("Token verification error:", err.message);
-          return res.status(403).json({
-            success: false,
-            message: "Invalid or expired token",
-          });
-        }
-
-        req.user = decoded;
-        next();
-      });
+        jwt.verify(token, process.env.JWT_KEY, (err, decoded) => {
+          if (err) {
+            if (err.name === 'TokenExpiredError') {
+              return res.status(401).json({ success: false, message: "Token expired" });
+            }
+            return res.status(403).json({ success: false, message: "Invalid token" });
+          }
+          req.user = decoded;
+          next();
+        });
+        
     } catch (error) {
       console.error("Auth error:", error);
       return res.status(500).json({
@@ -70,17 +69,8 @@ const Authorization = {
       });
     }
 
-    const hasPermission = Array.isArray(allowedRoles)
-      ? allowedRoles.some(role => {
-          const roleValue = typeof role === "string" 
-            ? ROLES[role.toUpperCase()] 
-            : role;
-          return userRoleValue >= roleValue;
-        })
-      : userRoleValue >= (typeof allowedRoles === "string" 
-          ? ROLES[allowedRoles.toUpperCase()] 
-          : allowedRoles);
-          
+    const hasPermission = allowedRoles.includes(req.user.role.toUpperCase());
+
     if (hasPermission) {
       return next();
     }
@@ -102,7 +92,7 @@ const Authorization = {
     }
 
     const userId = getResourceOwnerId(req);
-    if (String(req.user.id) === String(userId)) {
+    if (String(req.user.id) === String(userId) || req.user.role === ROLES.ADMIN) {
       return next();
     }
     return res.status(403).json({ success: false, message: "Access denied" });
