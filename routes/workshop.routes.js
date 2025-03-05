@@ -13,7 +13,7 @@ router
   )
   .get(WorkshopController.getAllWorkshops);
 
-router
+  router
   .route('/:id')
   .all(validateUUIDMiddleware)
   .get(WorkshopController.getWorkshopById)
