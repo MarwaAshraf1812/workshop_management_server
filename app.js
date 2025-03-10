@@ -3,6 +3,7 @@ const MaterialRouter = require("./routes/material.routes");
 const WorkshopRouter = require("./routes/workshop.routes");
 const NotificationRouter = require("./routes/notification.routes");
 const AssignmentRouter = require("./routes/assignment.routes");
+const quizRoutes = require("./routes/quiz.routes");
 const http = require("http");
 const socketConfig = require("./config/socket");
 const bodyParser = require("body-parser");
@@ -34,6 +35,7 @@ app.use("/api/workshop/materials", MaterialRouter);
 app.use("/api/workshop", WorkshopRouter);
 app.use("/api/notification", NotificationRouter);
 app.use("/api/assignment", AssignmentRouter);
+app.use("/api/quiz", quizRoutes);
 app.use("/auth", userRouter);
 
 app.listen(process.env.PORT || 5000, () => {
