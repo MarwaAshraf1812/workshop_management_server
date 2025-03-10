@@ -56,29 +56,31 @@ const Authorization = {
         message: "Authentication required",
       });
     }
-    
+  
     const userRoleValue =
       typeof req.user.role === "string"
-        ? ROLES[req.user.role.toUpperCase()]
+        ? ROLES[req.user.role.toUpperCase()] // Convert string role to number
         : req.user.role;
-        
-    if (!userRoleValue) {
+
+    if (!userRoleValue || !Object.values(ROLES).includes(userRoleValue)) {
       return res.status(403).json({
         success: false,
         message: "Invalid user role",
       });
     }
-
-    const hasPermission = allowedRoles.includes(req.user.role.toUpperCase());
-
+  
+    const allowedRoleValues = allowedRoles.map((role) =>
+      typeof role === "string" ? ROLES[role.toUpperCase()] : role
+    );
+  
+    const hasPermission = allowedRoleValues.includes(userRoleValue);
+  
     if (hasPermission) {
       return next();
     }
-    
-    return res
-      .status(403)
-      .json({ success: false, message: "Insufficient permissions" });
-  },
+  
+    return res.status(403).json({ success: false, message: "Insufficient permissions" });
+  },  
 
   /**
    * Checks if user owns the resource or has admin rights

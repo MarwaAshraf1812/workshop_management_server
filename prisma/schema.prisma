@@ -147,6 +147,7 @@ model Assignment {
   deadline        DateTime
   workshop_id     String
   created_at      DateTime @default(now())
+  updated_at     DateTime @updatedAt
   total_points    Int      @default(0)
   assignment_link String
 

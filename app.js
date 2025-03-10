@@ -2,6 +2,7 @@ const userRouter = require("./routes/user.routes");
 const MaterialRouter = require("./routes/material.routes");
 const WorkshopRouter = require("./routes/workshop.routes");
 const NotificationRouter = require("./routes/notification.routes");
+const AssignmentRouter = require("./routes/assignment.routes");
 const http = require("http");
 const socketConfig = require("./config/socket");
 const bodyParser = require("body-parser");
@@ -29,10 +30,10 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
-
 app.use("/api/workshop/materials", MaterialRouter);
 app.use("/api/workshop", WorkshopRouter);
 app.use("/api/notification", NotificationRouter);
+app.use("/api/assignment", AssignmentRouter);
 app.use("/auth", userRouter);
 
 app.listen(process.env.PORT || 5000, () => {
