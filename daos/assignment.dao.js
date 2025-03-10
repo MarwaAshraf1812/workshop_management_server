@@ -20,8 +20,17 @@ class AssignmentDAO {
           workshop_id: assignment.workshop_id,
           total_points: assignment.total_points,
           assignment_link: assignment.assignment_link
-        }
+        },
+        include: {
+          workshop: {
+            select: {
+              id: true,
+              title: true,
+            },
+          },
+        },
       });
+      
     } catch (error) {
       console.error("Error creating assignment:", error);
       throw error;
@@ -42,8 +51,6 @@ class AssignmentDAO {
           },
         },
       });
-  
-      console.log(assignment);
       return assignment
     } catch (error) {
       console.error("Error getting assignment by id:", error);
@@ -55,6 +62,14 @@ class AssignmentDAO {
   static async getAssignmentsByWorkshopId(workshop_id, page = 1, limit = 10) {
     try {
       const skip = (page - 1) * limit;
+
+      const workshop = await prisma.workshop.findUnique({
+        where: { id: workshop_id }
+      })
+
+      if (!workshop) {
+        return { assignments: [], pagination: { total: 0, page, limit, pages: 0 } };
+      }
       
       const [assignments, total] = await Promise.all([
         prisma.assignment.findMany({

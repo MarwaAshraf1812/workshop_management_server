@@ -46,15 +46,14 @@ class AssignmentDTO {
       title: assignment.title,
       description: assignment.description,
       deadline: assignment.deadline,
-      workshop_id: assignment.workshop_id,
       total_points: assignment.total_points,
       assignment_link: assignment.assignment_link,
       created_at: assignment.created_at,
       updated_at: assignment.updated_at,
-      workshop: {
+      workshop: assignment.workshop ? {
         id: assignment.workshop.id,
         name: assignment.workshop.title,
-      },
+      } : null,
     });
   }
   

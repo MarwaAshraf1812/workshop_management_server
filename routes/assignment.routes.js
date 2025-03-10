@@ -1,20 +1,16 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const AssignmentController = require('../controllers/assignment.controller');
-const { Authorization, ROLES } = require('../middlewares/Auth.middleware');
+const AssignmentController = require("../controllers/assignment.controller");
+const { Authorization, ROLES } = require("../middlewares/Auth.middleware");
 
-const ASSIGNMENT_ROLES = [
-  ROLES.ADMIN,
-  ROLES.MODERATOR,
-  ROLES.INSTRUCTOR,
-]
+const ASSIGNMENT_ROLES = [ROLES.ADMIN, ROLES.MODERATOR, ROLES.INSTRUCTOR];
 
 const STUDENT_ROLES = [
   ROLES.STUDENT,
   ROLES.USER,
   ROLES.INSTRUCTOR,
   ROLES.MODERATOR,
-  ROLES.ADMIN
+  ROLES.ADMIN,
 ];
 
 /**
@@ -23,47 +19,11 @@ const STUDENT_ROLES = [
  * @access  Private (Instructors, Moderators, Admins)
  */
 router.post(
-  '/',
+  "/",
   Authorization.verifyToken,
   Authorization.checkRoles(ASSIGNMENT_ROLES),
   AssignmentController.addNewAssignment
-)
-
-/**
- * @route   GET /api/assignments/:id
- * @desc    Get assignment by ID
- * @access  Private (Students, Instructors, Moderators, Admins)
- */
-router.get(
-  '/:id',
-  Authorization.verifyToken,
-  Authorization.checkRoles(STUDENT_ROLES),
-  AssignmentController.getAssignmentById
-)
-
-/**
- * @route   PUT /api/assignments/:id
- * @desc    Update assignment by ID
- * @access  Private (Instructors, Moderators, Admins)
- */
-router.put(
-  '/:id',
-  Authorization.verifyToken,
-  Authorization.checkRoles(ASSIGNMENT_ROLES),
-  AssignmentController.updateAssignment
-)
-
-/**
- * @route   DELETE /api/assignments/:id
- * @desc    Delete assignment by ID
- * @access  Private (Instructors, Moderators, Admins)
- */
-router.delete(
-  '/:id',
-  Authorization.verifyToken,
-  Authorization.checkRoles(ASSIGNMENT_ROLES),
-  AssignmentController.deleteAssignment
-)
+);
 
 /**
  * @route   GET /api/assignments/workshop/:id
@@ -71,10 +31,47 @@ router.delete(
  * @access  Private (Students, Instructors, Moderators, Admins)
  */
 router.get(
-  '/workshop/:id',
+  "/workshop/",
   Authorization.verifyToken,
   Authorization.checkRoles(STUDENT_ROLES),
   AssignmentController.getAllAssignments
-)
+);
+
+/**
+ * @route   GET /api/assignments/:id
+ * @desc    Get assignment by ID
+ * @access  Private (Students, Instructors, Moderators, Admins)
+ */
+router.get(
+  "/:id",
+  Authorization.verifyToken,
+  Authorization.checkRoles(STUDENT_ROLES),
+  AssignmentController.getAssignmentById
+);
+
+/**
+ * @route   PUT /api/assignments/:id
+ * @desc    Update assignment by ID
+ * @access  Private (Instructors, Moderators, Admins)
+ */
+router.put(
+  "/:id",
+  Authorization.verifyToken,
+  Authorization.checkRoles(ASSIGNMENT_ROLES),
+  AssignmentController.updateAssignment
+);
+
+/**
+ * @route   DELETE /api/assignments/:id
+ * @desc    Delete assignment by ID
+ * @access  Private (Instructors, Moderators, Admins)
+ */
+router.delete(
+  "/:id",
+  Authorization.verifyToken,
+  Authorization.checkRoles(ASSIGNMENT_ROLES),
+  AssignmentController.deleteAssignment
+);
+
 
 module.exports = router;

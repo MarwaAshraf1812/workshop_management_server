@@ -39,7 +39,6 @@ class AssignmentController {
       
       const assignment = await AssignmentService.getAssignmentById(id);
       
-      console.log ("controller" , assignment)
       return res.status(200).json({
         success: true,
         data: assignment
@@ -142,6 +141,9 @@ class AssignmentController {
   static async deleteAssignment(req, res) {
     try {
       const { id } = req.params;
+
+      console.log("Received ID:", id, "Type:", typeof id);
+
       
       if (!id) {
         return res.status(400).json({ 
@@ -150,9 +152,14 @@ class AssignmentController {
         });
       }
       
-      await AssignmentService.deleteAssignment(id);
-      
-      return res.status(204).send();
+      const deletedAssignment = await AssignmentService.deleteAssignment(id);
+      if (deletedAssignment) {
+        return res.status(200).json({ 
+          success: true, 
+          message: "Assignment deleted successfully"
+        });
+      }
+
     } catch (error) {
       console.error("Error deleting assignment in controller layer:", error);
       

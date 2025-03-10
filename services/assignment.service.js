@@ -23,8 +23,6 @@ class AssignmentService {
       if (!assignment) {
         throw new NotFoundError(`Assignment with ID ${id} not found`);
       }
-
-      console.log("services", assignment)
       
       return AssignmentDTO.fromDatabase(assignment);
     } catch (error) {
@@ -80,8 +78,7 @@ class AssignmentService {
       if (!id) {
         throw new ValidationError("Assignment ID is required");
       }
-      
-      // Check if assignment exists
+
       const existingAssignment = await AssignmentDAO.getAssignmentById(id);
       if (!existingAssignment) {
         throw new NotFoundError(`Assignment with ID ${id} not found`);
