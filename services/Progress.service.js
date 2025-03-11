@@ -2,6 +2,16 @@ const ProgressDAO = require("../daos/Progress.dao");
 
 class ProgressService {
 
+    static async createProgress(student, workshop){
+        try {
+            const progress = await ProgressDAO.createProgress(student, workshop);
+            return progress
+        }
+        catch(err){
+            throw new Error(err.message);
+        }
+    }
+
     static async getProgress(student, workshop){
         try {
             const progress = await ProgressDAO.getProgress(student, workshop);
@@ -12,27 +22,27 @@ class ProgressService {
         }
     }
 
-    static async attend(student, workshop){
+    static async attend(id){
         try {
-            await ProgressDAO.increaseAttendance(student, workshop);
+            await ProgressDAO.increaseAttendance(id);
         }
         catch(err){
             throw new Error(err.message);
         }
     }
 
-    static async addAssigmentScore(student, workshop, amount){
+    static async addAssigmentScore(id, amount){
         try {
-            await ProgressDAO.increaseAssignmentScore(student, workshop, amount);
+            await ProgressDAO.increaseAssignmentScore(id, amount);
         }
         catch(err){
             throw new Error(err.message);
         }
     }
 
-    static async addQuizScore(student, workshop, amount){
+    static async addQuizScore(id, amount){
         try {
-            await ProgressDAO.increaseQuizeScore(student, workshop, amount);
+            await ProgressDAO.increaseQuizeScore(id, amount);
         }
         catch (err){
             throw new Error(err.message);

@@ -1,12 +1,32 @@
-const { PrismaClient } = require("@prisma/client")
+const { PrismaClient } = require("@prisma/client");
+const LeaderboardDAO = require("./Leaderboard.dao");
 
 const prisma = new PrismaClient()
 
 class ProgressDAO {
+
+    static async createProgress(studentId, workshopId){
+        try {
+            const progress = await prisma.progress.create({
+                data: {
+                    student_id: studentId,
+                    workshop_id: workshopId
+                }
+            })
+
+            return progress;
+        }
+        catch (err){
+            throw new Error(err.message)
+        }
+        finally {
+            await prisma.$disconnect();
+        }
+    }
     
     static async getProgress(studentId, workshopId){
         try{
-            const progress = await prisma.progress.findUnique({
+            const progress = await prisma.progress.findFirst({
                 where:{
                     student_id: studentId,
                     workshop_id: workshopId
@@ -22,12 +42,11 @@ class ProgressDAO {
         }
     }
 
-    static async updateProgress(studentId, workshopId, edits){
+    static async updateProgress(id, edits){
         try{
             const updated = await prisma.progress.update({
                 where: {
-                    student_id: studentId,
-                    workshop_id: workshopId
+                    id: id
                 },
                 data: {edits}
             })
@@ -41,17 +60,20 @@ class ProgressDAO {
         }
     }
 
-    static async increaseAttendance(studentId, workshopId){
+    static async increaseAttendance(id){
         try {
-            return await prisma.progress.update({
+            const progress = await prisma.progress.update({
                 where: {
-                    student_id: studentId,
-                    workshop_id: workshopId
+                    id: id
                 },
                 data:{
                     attendances: {increment: 1},
-                }
+                },
             })
+
+            await LeaderboardDAO.addPoints(progress.student_id, 1);
+
+            return progress;
         }
         catch (err){
             throw new Error(err.message);
@@ -61,18 +83,19 @@ class ProgressDAO {
         }
     }
 
-    static async increaseAssignmentScore(studentId, workshopId, score){
+    static async increaseAssignmentScore(id, score){
         try{
-            return await prisma.progress.update({
+            const progress = await prisma.progress.update({
                 where: {
-                    student_id: studentId,
-                    workshop_id: workshopId
+                    id: id
                 },
                 data: { 
                     assignments_scores: {increment: score},
                     total_points: {increment: score}
                 }
             })
+            await LeaderboardDAO.addPoints(progress.student_id, score);
+            return progress;
         }
         catch(err){
             throw new Error(err.message);
@@ -82,18 +105,21 @@ class ProgressDAO {
         }
     }
 
-    static async increaseQuizeScore(studentId, workshopId, score){
+    static async increaseQuizeScore(id, score){
         try{
-            return await prisma.progress.update({
+            const progress = await prisma.progress.update({
                 where: {
-                    student_id: studentId,
-                    workshop_id: workshopId
+                    id: id
                 },
                 data: {
                     quizes_score: {increment: score},
                     total_points: {increment: score}
                 }
             })
+
+            await LeaderboardDAO.addPoints(progress.student_id, score);
+
+            return progress;
         }
         catch(err){
             throw new Error(err.message)

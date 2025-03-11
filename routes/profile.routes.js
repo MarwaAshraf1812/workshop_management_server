@@ -5,6 +5,6 @@ const Authorization = require('../middlewares/Auth.middleware')
 const router = express.Router();
 
 router.route('/:id').get(ProfileController.getProfile)
-router.route('/').post(Authorization.userAuthorization, ProfileController.createProfile)
+router.route('/').post(ProfileController.createProfile)
 
 module.exports = router

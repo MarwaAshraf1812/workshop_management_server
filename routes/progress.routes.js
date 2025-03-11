@@ -1,12 +1,33 @@
 const express = require('express');
 const ProgressController = require('../controllers/Progress.controller');
-const { default: Authorization } = require('../middlewares/Auth.middleware');
+const { Authorization } = require('../middlewares/Auth.middleware');
 
 const router = express.Router();
 
-router.route('/:student_id/:workshop_id').get(Authorization.moderatorAuthorization, ProgressController.getProgress)
-router.route('/attendance/:student_id/:workshop_id').put(Authorization.moderatorAuthorization, ProgressController.attend)
-router.route('/assignment_grade/:student_id/:workshop_id').put(Authorization.moderatorAuthorization, ProgressController.addAssignmentGrade)
-router.route('/quiz_grade/:student_id/:workshop_id').put(Authorization.moderatorAuthorization, ProgressController.addQuizGrade)
+router.route('/').post(ProgressController.createProgress);
+
+router.route('/:student_id/:workshop_id')
+.get(
+    // Authorization.checkRoles(['MODERATOR']), 
+    ProgressController.getProgress
+)
+
+router.route('/attendance/:progress_id')
+.put(
+    // Authorization.checkRoles(['MODERATOR']), 
+    ProgressController.attend
+)
+
+router.route('/assignment_grade/:progress_id')
+.put(
+    // Authorization.checkRoles(['MODERATOR']), 
+    ProgressController.addAssignmentGrade
+)
+
+router.route('/quiz_grade/:progress_id')
+.put(
+    // Authorization.checkRoles(['MODERATOR']), 
+    ProgressController.addQuizGrade
+)
 
 module.exports = router;

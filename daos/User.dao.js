@@ -13,6 +13,9 @@ class UserDAO{
                     username: user.username,
                     email: user.email,
                     password: user.password,
+                    leaderBoard: {
+                        create: {}
+                    }
                 }
             })
 

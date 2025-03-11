@@ -49,7 +49,7 @@ class LeaderboardDAO {
                 }
             }) 
 
-            await Leaderboard.recalculateRanks();
+            await LeaderboardDAO.recalculateRanks();
         }
         catch(err){
             throw new Error(err.message)
