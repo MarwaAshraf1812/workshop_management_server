@@ -7,14 +7,16 @@ class QuizDTO {
     this.quiz_link = data.quiz_link;
     this.total_points = data.total_points;
     this.created_at = data.created_at;
-    this.workshop = workshop ? {
-      id: workshop.id,
-      name: workshop.title,
-    } : null;
+    if (data.workshop) {
+      this.workshop = {
+        id: data.workshop.id,
+        name: data.workshop.name,
+      };
+    }
   }
 
   static fromRequest(data) {
-    return new QuizDTO ({
+    return new QuizDTO({
       title: data.title,
       deadline: data.deadline,
       workshop_id: data.workshop_id,
@@ -24,7 +26,7 @@ class QuizDTO {
   }
 
   static fromDatabase(data) {
-    return new QuizDTO ({
+    return new QuizDTO({
       id: data.id,
       title: data.title,
       deadline: data.deadline,
@@ -32,7 +34,26 @@ class QuizDTO {
       quiz_link: data.quiz_link,
       total_points: data.total_points,
       created_at: data.created_at,
-    })
+      workshop: data.workshop
+        ? {
+            id: data.workshop.id,
+            name: data.workshop.title,
+          }
+        : null,
+    });
+  }
+
+  validateDeadline(deadline) {
+    if (!deadline) {
+      throw new Error("Deadline is required");
+    }
+    
+    const date = new Date(deadline);
+    if (isNaN(date.getTime())) {
+      throw new Error("Invalid deadline format");
+    }
+    
+    return date;
   }
 }
 

@@ -5,7 +5,14 @@ class QuizDAO {
     try {
       return await prisma.quiz.create({
         data: quiz,
-        include: { workshop: true },
+        include: {
+          workshop: {
+            select: {
+              id: true,
+              title: true,
+            },
+          },
+        },
       })
     } catch (error) {
       console.error("Error creating quiz:", error);
@@ -45,7 +52,7 @@ class QuizDAO {
         include: { workshop: true },
         skip: skip,
         take: options.pageSize,
-        orderBy: { createdAt: 'desc' }, 
+        orderBy: { created_at: 'desc' }, 
       });
     } catch (error) {
       console.error("Error getting workshop quizzes:", error);

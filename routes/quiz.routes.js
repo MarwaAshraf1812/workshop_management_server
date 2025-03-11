@@ -14,7 +14,7 @@ const STUDENT_ROLES = [
 
 
 /**
- * @route   POST /api/auiz
+ * @route   POST /api/quiz
  * @desc    Create a new quiz
  * @access  Private (Instructors, Moderators, Admins)
  */

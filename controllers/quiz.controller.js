@@ -29,7 +29,7 @@ class QuizController {
 
 
   static async getQuizById(req, res) {
-    try {u
+    try {
       const quiz = await QuizService.getQuizById(req.params.id);
       res.status(200).json({ success: true, data: quiz });
     } catch (error) {
@@ -71,8 +71,8 @@ class QuizController {
 
   static async deleteQuiz(req, res) {
     try {
-      const quiz = await QuizService.deleteQuiz(req.params.id);
-      res.status(200).json({ success: true, data: quiz });
+      await QuizService.deleteQuiz(req.params.id);
+      res.status(200).json({ success: true, message: "Quiz deleted" });
     } catch (error) {
       console.error("Error deleting quiz in controller:", error);
       
