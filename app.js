@@ -2,7 +2,9 @@ const userRouter = require("./routes/user.routes");
 const MaterialRouter = require("./routes/material.routes");
 const WorkshopRouter = require("./routes/workshop.routes");
 const NotificationRouter = require("./routes/notification.routes");
-const ProgressRouter = require('./routes/progress.routes')
+const AssignmentRouter = require("./routes/assignment.routes");
+const quizRoutes = require("./routes/quiz.routes");
+const ProgressRouter = require("./routes/progress.routes")
 const LeaderboardRouter = require('./routes/leader.routes')
 const SubmissionRouter = require('./routes/submission.routes')
 
@@ -33,15 +35,15 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
-
 app.use("/api/workshop/materials", MaterialRouter);
 app.use("/api/workshop", WorkshopRouter);
 app.use("/api/notification", NotificationRouter);
-app.use("/api/auth", userRouter);
-app.use('/api/progress', ProgressRouter)
-app.use('/api/leaderboard', LeaderboardRouter)
-app.use('/api/submission', SubmissionRouter)
-
+app.use("/api/assignment", AssignmentRouter);
+app.use("/api/quiz", quizRoutes);
+app.use("/auth", userRouter);
+app.use("/api/progress", ProgressRouter)
+app.use("/api/leaderboard", LeaderboardRouter)
+app.use("/api/submission", SubmissionRouter);
 
 app.listen(process.env.PORT || 5000, () => {
   console.log(`Server is running on port ${process.env.PORT || 5000}`);
