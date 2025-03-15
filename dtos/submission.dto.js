@@ -4,7 +4,6 @@ class SubmissionDTO {
             student_id: data.student_id,
             assignment_id: data.assignment_id,
             assignment_link: data.assignment_link,
-            submitted_at: data.submitted_at,
         }
     }
 
