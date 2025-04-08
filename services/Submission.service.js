@@ -2,9 +2,9 @@ const SubmissionDAO = require("../daos/Submission.dao")
 
 class SubmissionService {
 
-    static async submitAssignment(studentId, assignmentId, assignmentData){
+    static async submitAssignment(studentId, assignmentId, assignment_link){
         try {
-            const submission = await SubmissionDAO.createSubmission(studentId, assignmentId, assignmentData.link);
+            const submission = await SubmissionDAO.createSubmission(studentId, assignmentId, assignment_link);
             return submission;
         }
         catch(err){

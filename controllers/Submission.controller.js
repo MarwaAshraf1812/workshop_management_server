@@ -6,8 +6,8 @@ class SubmissionController {
     static async submitAssignment(req, res){
 
         try{
-            const {student_id, assignment_id, ...rest} = SubmissionDTO.fromRequest(req.body)
-            const submission = await SubmissionService.submitAssignment(student_id, assignment_id, rest)
+            const {student_id, assignment_id, assignment_link} = SubmissionDTO.fromRequest(req.body)
+            const submission = await SubmissionService.submitAssignment(student_id, assignment_id, assignment_link)
     
             return res.status(201).json(SubmissionDTO.toResponse(submission));
         }

@@ -26,7 +26,7 @@ class SubmissionDAO {
 
     static async getSubmission(studentId, assignmentId){
         try {
-            const submission = await prisma.submission.findUnique({
+            const submission = await prisma.submission.findFirst({
                 where: {
                     student_id: studentId,
                     assignment_id: assignmentId
