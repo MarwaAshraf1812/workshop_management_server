@@ -1,4 +1,5 @@
 const prisma = require("../config/prisma");
+const LeaderboardDAO = require("./Leaderboard.dao"); 
 
 class ProgressDAO {
     static async createProgress(studentId, workshopId) {
@@ -132,7 +133,7 @@ class ProgressDAO {
                 Number(progress.quizes_score) +
                 progress.attendance_points;
 
-            return await prisma.progress.update({
+            await prisma.progress.update({
                 where: {
                     student_id_workshop_id: {
                         student_id: studentId,
@@ -143,6 +144,19 @@ class ProgressDAO {
                     total_points: total,
                 },
             });
+
+            await prisma.leaderBoard.update({
+                where: {
+                    student_id: studentId,
+                },
+                data: {
+                    total_points: total,
+                },
+            });
+
+            await LeaderboardDAO.recalculateRanks();
+
+            return total;
         } catch (err) {
             throw new Error(err.message);
         }

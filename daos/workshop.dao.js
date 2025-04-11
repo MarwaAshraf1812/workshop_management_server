@@ -1,5 +1,5 @@
 const prisma = require("../config/prisma");
-const { PrismaClientKnownRequestError } = require("@prisma/client");
+const LeaderboardDAO = require("./Leaderboard.dao"); 
 
 class WorkshopDAO {
   async createWorkshop(workshopData) {
@@ -127,7 +127,7 @@ class WorkshopDAO {
       if (existingUser) {
         return {
           exists: true,
-          data: existingUser // Return the existing user data
+          data: existingUser
         };
       }
 
@@ -141,6 +141,31 @@ class WorkshopDAO {
           workshop: true,
         },
       });
+
+      const existingProgress = await prisma.progress.findUnique({
+        where: {
+            student_id_workshop_id: {
+                student_id: userId,
+                workshop_id: workshopId,
+            },
+        },
+    });
+
+    if (!existingProgress) {
+        await prisma.progress.create({
+            data: {
+                student_id: userId,
+                workshop_id: workshopId,
+                assignments_scores: 0,
+                quizes_score: 0,
+                attendances: 0,
+                attendance_points: 0,
+                total_points: 0,
+            },
+        });
+    }
+
+    await LeaderboardDAO.ensureBoard(userId);
 
       return {
         exists: false,

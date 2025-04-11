@@ -6,6 +6,7 @@ const AssignmentRouter = require("./routes/assignment.routes");
 const quizRoutes = require("./routes/quiz.routes");
 const SubmissionRouter = require("./routes/submission.routes");
 const progressRouter = require("./routes/progress.routes");
+const LeaderboardRouter = require("./routes/leader.routes");
 const http = require("http");
 const socketConfig = require("./config/socket");
 const bodyParser = require("body-parser");
@@ -40,6 +41,7 @@ app.use("/api/assignment", AssignmentRouter);
 app.use("/api/quiz", quizRoutes);
 app.use("/api/submissions", SubmissionRouter);
 app.use("/api/progress", progressRouter);
+app.use("/api/leaderboard", LeaderboardRouter);
 app.use("/auth", userRouter);
 
 app.listen(process.env.PORT || 5000, () => {

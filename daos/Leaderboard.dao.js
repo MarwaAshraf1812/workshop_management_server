@@ -1,11 +1,29 @@
-const { PrismaClient } = require("@prisma/client")
-
-const prisma = new PrismaClient();
+const prisma = require('../config/prisma');
 
 class LeaderboardDAO {
+    static async ensureBoard(studentId) {
+        const existing = await prisma.leaderBoard.findUnique({
+            where: { student_id: studentId }
+        });
+    
+        if (!existing) {
+            return await prisma.leaderBoard.create({
+                data: {
+                    student_id: studentId,
+                    total_points: 0,
+                    rank: 0
+                }
+            });
+        }
+    
+        return existing;
+    }
+    
 
     static async getLeaderboard(studentId){
         try {
+            await this.ensureBoard(studentId);
+
             const leaderboard = await prisma.leaderBoard.findUnique({
                 where: {
                     student_id: studentId
@@ -16,9 +34,6 @@ class LeaderboardDAO {
         }
         catch(err){
             throw new Error(err.message)
-        }
-        finally{
-            await prisma.$disconnect();
         }
     }
 
@@ -35,9 +50,6 @@ class LeaderboardDAO {
         catch(err){
             throw new Error(err.message);
         }
-        finally{
-            await prisma.$disconnect();
-        }
     }
 
     static async addPoints(studentId, new_points){
@@ -49,13 +61,11 @@ class LeaderboardDAO {
                 }
             }) 
 
-            await Leaderboard.recalculateRanks();
+            await this.recalculateRanks();
+
         }
         catch(err){
             throw new Error(err.message)
-        }
-        finally{
-            await prisma.$disconnect()
         }
     }
 
