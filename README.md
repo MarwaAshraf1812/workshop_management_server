@@ -44,37 +44,6 @@ The **Workshop Management System** is designed to streamline the organization of
 
 ---
 
-## User Roles & Permissions
-
-### 🧑‍🎓 **Student**
-- Register, login, logout, view/edit profile
-- View assigned workshops and details
-- View linked presentations
-- Submit assignments and take quizzes
-- View own progress & points
-- Receive notifications and announcements
-- View leaderboard and personal rank
-
-### 👩‍💼 **HR**
-- Login, logout
-- View student information
-- View & manage workshops (create/edit if allowed)
-- Upload presentations and link to workshops
-- Create, edit, assign, and grade quizzes & assignments
-- View & update student progress, assign points
-- View leaderboard
-- Send notifications and feedback
-
-### 👑 **Admin**
-- Full access: Create, view, edit, delete any user (Students, HRs, Admins)
-- Full CRUD operations for all workshops, presentations, quizzes, and assignments
-- Full access to all student progress tracking
-- Manage leaderboard data
-- Send announcements and alerts
-- System-wide configurations (optional)
-
----
-
 ## Installation
 
 ### Prerequisites
