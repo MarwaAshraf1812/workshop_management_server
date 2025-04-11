@@ -22,6 +22,7 @@ router.route("/:student_id/:workshop_id")
     Authorization.checkRoles(ADMIN_AUTHORITY),
     ProgressController.create
   )
+router.route("/:progress_id")
   .delete(
     Authorization.verifyToken,
     Authorization.checkRoles(ADMIN_AUTHORITY),

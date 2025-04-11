@@ -33,16 +33,23 @@ class ProgressDAO {
         }
     }
 
-    static async deleteProgress(studentId, workshopId) {
+    static async deleteProgress(progressId) {
         try {
+            const progressExists = await prisma.progress.findUnique({
+                where: {
+                    id: progressId,
+                },
+            })
+
+            if (!progressExists) {
+                throw new Error("Progress not found");
+            }
             const progress = await prisma.progress.delete({
                 where: {
-                    student_id_workshop_id: {
-                        student_id: studentId,
-                        workshop_id: workshopId,
-                    },
+                    id: progressId,
                 },
             });
+
             return progress;
         } catch (err) {
             throw new Error(err.message);
@@ -105,7 +112,7 @@ class ProgressDAO {
 
     static async recalculateTotalPoints(studentId, workshopId) {
         try {
-            const progress = await prisma.progress.findFirst({
+            const progress = await prisma.progress.findUnique({
                 where: {
                     student_id_workshop_id: {
                         student_id: studentId,
@@ -123,7 +130,7 @@ class ProgressDAO {
             const total =
                 Number(progress.assignments_scores) +
                 Number(progress.quizes_score) +
-                progress.attendance_points * 5;
+                progress.attendance_points;
 
             return await prisma.progress.update({
                 where: {
@@ -152,6 +159,7 @@ class ProgressDAO {
                 },
                 data: {
                     attendances: { increment: 1 },
+                    attendance_points: { increment: 5 },
                 },
             });
 
@@ -163,16 +171,19 @@ class ProgressDAO {
 
     static async increaseAssignmentScore(studentId, workshopId, score) {
         try {
-            return await prisma.progress.update({
+            await prisma.progress.update({
                 where: {
-                    student_id: studentId,
-                    workshop_id: workshopId,
+                    student_id_workshop_id: {
+                        student_id: studentId,
+                        workshop_id: workshopId,
+                    },
                 },
                 data: {
                     assignments_scores: { increment: score },
-                    total_points: { increment: score },
                 },
             });
+
+            return await this.recalculateTotalPoints(studentId, workshopId);
         } catch (err) {
             throw new Error(err.message);
         }
@@ -180,16 +191,18 @@ class ProgressDAO {
 
     static async increaseQuizeScore(studentId, workshopId, score) {
         try {
-            return await prisma.progress.update({
+            await prisma.progress.update({
                 where: {
-                    student_id: studentId,
-                    workshop_id: workshopId,
+                    student_id_workshop_id: {
+                        student_id: studentId,
+                        workshop_id: workshopId,
+                    },
                 },
                 data: {
                     quizes_score: { increment: score },
-                    total_points: { increment: score },
                 },
             });
+            return await this.recalculateTotalPoints(studentId, workshopId);
         } catch (err) {
             throw new Error(err.message);
         }

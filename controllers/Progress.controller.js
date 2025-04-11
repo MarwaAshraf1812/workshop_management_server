@@ -18,12 +18,15 @@ class ProgressController {
 
     static async delete(req, res){
         try{
-            const {student_id, workshop_id} = req.params;
-            if (!student_id || !workshop_id) {
+            const { progress_id } = req.params;
+            if (!progress_id) {
                 return res.status(400).json({error: "Missing parameters"});
             }
-            const progress = await ProgressService.deleteProgress(student_id, workshop_id);
-            return res.status(200).json(ProgressDTO.toResponse(progress));
+            const progress = await ProgressService.deleteProgress(progress_id);
+            if (!progress) {
+                return res.status(404).json({error: "Progress not found"});
+            }
+            return res.status(200).send("Progress deleted");
         } catch(err){
             return res.status(500).json({error: err.message})
         }

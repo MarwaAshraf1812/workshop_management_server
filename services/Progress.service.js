@@ -11,9 +11,9 @@ class ProgressService {
         }
     }
 
-    static async deleteProgress(student, workshop){
+    static async deleteProgress(progressId){
         try {
-            const progress = await ProgressDAO.deleteProgress(student, workshop);
+            const progress = await ProgressDAO.deleteProgress(progressId);
             return progress;
         }
         catch(err){
