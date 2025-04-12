@@ -11,6 +11,9 @@ const http = require("http");
 const socketConfig = require("./config/socket");
 const bodyParser = require("body-parser");
 const express = require("express");
+const xss = require("xss-clean");
+const rateLimit = require("express-rate-limit");
+const helmet = require("helmet");
 require("dotenv").config();
 
 const app = express();
@@ -30,10 +33,37 @@ io.on("connection", (socket) => {
   });
 });
 
+ //prevent common vulnerabilities
+app.use(helmet());// Set security HTTP headers
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", 'https:', "'unsafe-inline'"],
+      imgSrc: ["'self'", 'data:', 'https:'],
+      connectSrc: ["'self'"],
+    },
+  })
+);
+
+/** Limiting the number of requests 
+ * from a single IP address
+ * to prevent DDoS attacks
+ * and brute-force attacks 
+ * */
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: "Too many requests from this IP, please try again later.",
+});
+app.use(limiter);
+
 app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(xss()); // prevent sql injection
 app.use("/api/workshop/materials", MaterialRouter);
 app.use("/api/workshop", WorkshopRouter);
 app.use("/api/notification", NotificationRouter);

@@ -44,7 +44,8 @@ class AuthService{
             const accessToken = jwt.sign({
                 id: user.id,
                 role: user.role
-            }, process.env.JWT_KEY)
+            }, process.env.JWT_KEY
+            , {expiresIn: '1h'});
 
             return {accessToken, user}
 
