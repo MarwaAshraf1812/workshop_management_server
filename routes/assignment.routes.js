@@ -1,34 +1,26 @@
 const express = require("express");
-const router = express.Router();
 const AssignmentController = require("../controllers/assignment.controller");
-const { Authorization, ROLES } = require("../middlewares/Auth.middleware");
+const { Authorization } = require("../middlewares/Auth.middleware");
+const { ADMIN_AUTHORITY, STUDENT_ROLES } = require("../utils/UserRole");
 
-const ASSIGNMENT_ROLES = [ROLES.ADMIN, ROLES.MODERATOR, ROLES.INSTRUCTOR];
-
-const STUDENT_ROLES = [
-  ROLES.STUDENT,
-  ROLES.USER,
-  ROLES.INSTRUCTOR,
-  ROLES.MODERATOR,
-  ROLES.ADMIN,
-];
+const router = express.Router();
 
 /**
  * @route   POST /api/assignments
  * @desc    Create a new assignment
- * @access  Private (Instructors, Moderators, Admins)
+ * @access  Private (Admin roles only)
  */
 router.post(
   "/",
   Authorization.verifyToken,
-  Authorization.checkRoles(ASSIGNMENT_ROLES),
+  Authorization.checkRoles(ADMIN_AUTHORITY),
   AssignmentController.addNewAssignment
 );
 
 /**
- * @route   GET /api/assignments/workshop/:id
+ * @route   GET /api/assignments/workshop
  * @desc    Get all assignments for a workshop
- * @access  Private (Students, Instructors, Moderators, Admins)
+ * @access  Private (Students, Instructors, Admins)
  */
 router.get(
   "/workshop/",
@@ -40,7 +32,7 @@ router.get(
 /**
  * @route   GET /api/assignments/:id
  * @desc    Get assignment by ID
- * @access  Private (Students, Instructors, Moderators, Admins)
+ * @access  Private (Students, Instructors, Admins)
  */
 router.get(
   "/:id",
@@ -52,26 +44,25 @@ router.get(
 /**
  * @route   PUT /api/assignments/:id
  * @desc    Update assignment by ID
- * @access  Private (Instructors, Moderators, Admins)
+ * @access  Private (Admin roles only)
  */
 router.put(
   "/:id",
   Authorization.verifyToken,
-  Authorization.checkRoles(ASSIGNMENT_ROLES),
+  Authorization.checkRoles(ADMIN_AUTHORITY),
   AssignmentController.updateAssignment
 );
 
 /**
  * @route   DELETE /api/assignments/:id
  * @desc    Delete assignment by ID
- * @access  Private (Instructors, Moderators, Admins)
+ * @access  Private (Admin roles only)
  */
 router.delete(
   "/:id",
   Authorization.verifyToken,
-  Authorization.checkRoles(ASSIGNMENT_ROLES),
+  Authorization.checkRoles(ADMIN_AUTHORITY),
   AssignmentController.deleteAssignment
 );
-
 
 module.exports = router;

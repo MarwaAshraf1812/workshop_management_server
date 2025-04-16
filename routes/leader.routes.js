@@ -1,25 +1,32 @@
 const express = require('express');
 const LeaderboardController = require('../controllers/Leaderboard.controller');
-const { Authorization, ROLES } = require("../middlewares/Auth.middleware");
-
-const LEADERBOARD_ROLES = [ROLES.ADMIN, ROLES.MODERATOR, ROLES.INSTRUCTOR];
-const STUDENT_ROLES = [
-  ROLES.STUDENT,
-  ROLES.INSTRUCTOR,
-  ROLES.MODERATOR,
-  ROLES.ADMIN,
-];
-
+const { Authorization } = require("../middlewares/Auth.middleware");
+const { STUDENT_ROLES, ADMIN_AUTHORITY } = require("../utils/UserRole");
 
 const router = express.Router();
-router.route('/list_all').get(
-  Authorization.verifyToken,
-  Authorization.checkRoles(LEADERBOARD_ROLES),
-  LeaderboardController.listAllRanks)
 
-router.route('/:student_id').get(
+/**
+ * @route   GET /api/leaderboard/list_all
+ * @desc    List all students with their leaderboard ranks
+ * @access  Private (Admins, Moderators, Instructors)
+ */
+router.get(
+  '/list_all',
+  Authorization.verifyToken,
+  Authorization.checkRoles(ADMIN_AUTHORITY),
+  LeaderboardController.listAllRanks
+);
+
+/**
+ * @route   GET /api/leaderboard/:student_id
+ * @desc    Get leaderboard info for a specific student
+ * @access  Private (Students + Higher roles)
+ */
+router.get(
+  '/:student_id',
   Authorization.verifyToken,
   Authorization.checkRoles(STUDENT_ROLES),
-  LeaderboardController.getStudentBoard)
+  LeaderboardController.getStudentBoard
+);
 
-module.exports = router
+module.exports = router;

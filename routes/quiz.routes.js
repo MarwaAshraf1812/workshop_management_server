@@ -1,17 +1,9 @@
 const express = require("express");
-const router = express.Router();
 const quizController = require("../controllers/quiz.controller");
-const { Authorization, ROLES } = require("../middlewares/Auth.middleware");
+const { Authorization } = require("../middlewares/Auth.middleware");
+const { ADMIN_AUTHORITY, STUDENT_ROLES } = require("../constants/roles");
 
-const ASSIGNMENT_ROLES = [ROLES.ADMIN, ROLES.MODERATOR, ROLES.INSTRUCTOR];
-const STUDENT_ROLES = [
-  ROLES.STUDENT,
-  ROLES.USER,
-  ROLES.INSTRUCTOR,
-  ROLES.MODERATOR,
-  ROLES.ADMIN,
-];
-
+const router = express.Router();
 
 /**
  * @route   POST /api/quiz
@@ -21,15 +13,14 @@ const STUDENT_ROLES = [
 router.post(
   "/",
   Authorization.verifyToken,
-  Authorization.checkRoles(ASSIGNMENT_ROLES),
+  Authorization.checkRoles(ADMIN_AUTHORITY),
   quizController.createQuiz
 );
-
 
 /**
  * @route   GET /api/quiz/:id
  * @desc    Get a quiz by id
- * @access  Private (Instructors, Moderators, Admins)
+ * @access  Private (Students, Instructors, Moderators, Admins)
  */
 router.get(
   "/:id",
@@ -40,11 +31,9 @@ router.get(
 
 /**
  * @route   GET /api/quiz/workshop/:workshop_id
- * @desc    Get all quizes for a workshop
- * @access  Private (Instructors, Moderators, Admins)
- * @query   page, limit
+ * @desc    Get all quizzes for a workshop
+ * @access  Private (Students, Instructors, Moderators, Admins)
  */
-
 router.get(
   "/workshop/:workshop_id",
   Authorization.verifyToken,
@@ -57,11 +46,10 @@ router.get(
  * @desc    Delete a quiz by id
  * @access  Private (Instructors, Moderators, Admins)
  */
-
 router.delete(
   "/:id",
   Authorization.verifyToken,
-  Authorization.checkRoles(ASSIGNMENT_ROLES),
+  Authorization.checkRoles(ADMIN_AUTHORITY),
   quizController.deleteQuiz
 );
 
