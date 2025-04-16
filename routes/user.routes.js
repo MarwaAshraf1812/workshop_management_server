@@ -11,7 +11,19 @@ const loginLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+/**
+ * @route   POST /api/auth
+ * @desc    Register a new user
+ * @access  Public
+ */
+
 router.route('/').post(AuthController.register)
+
+/**
+ * @route   POST /api/auth/login
+ * @desc    Login a user
+ * @access  Public
+ */
 router.route('/login').post(
   loginLimiter,
   AuthController.authenticate)

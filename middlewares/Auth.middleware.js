@@ -1,17 +1,14 @@
 const jwt = require("jsonwebtoken");
 
 const ROLES = {
-  USER: 1,
-  INSTRUCTOR: 2,
-  MODERATOR: 3,
-  ADMIN: 4,
-  STUDENT: 5,
+  STUDENT: 1,
+  USER: 2,
+  INSTRUCTOR: 3,
+  MODERATOR: 4,
+  ADMIN: 5,
 };
 
 const Authorization = {
-  /**
-   * Verifies the JWT token from the request header
-   */
   verifyToken: (req, res, next) => {
     try {
       const authHeader = req.headers.authorization;
@@ -26,17 +23,18 @@ const Authorization = {
         ? authHeader.slice(7)
         : authHeader;
 
-        jwt.verify(token, process.env.JWT_KEY, (err, decoded) => {
-          if (err) {
-            if (err.name === 'TokenExpiredError') {
-              return res.status(401).json({ success: false, message: "Token expired" });
-            }
-            return res.status(403).json({ success: false, message: "Invalid token" });
-          }
-          req.user = decoded;
-          next();
-        });
-        
+      jwt.verify(token, process.env.JWT_KEY, (err, decoded) => {
+        if (err) {
+          return res.status(401).json({
+            success: false,
+            message: err.name === 'TokenExpiredError' ? "Token expired" : "Invalid token",
+          });
+        }
+
+        req.user = decoded;
+        next();
+      });
+
     } catch (error) {
       console.error("Auth error:", error);
       return res.status(500).json({
@@ -46,9 +44,6 @@ const Authorization = {
     }
   },
 
-  /**
-   * Checks if user has required role(s)
-   */
   checkRoles: (allowedRoles) => (req, res, next) => {
     if (!req.user) {
       return res.status(401).json({
@@ -56,10 +51,10 @@ const Authorization = {
         message: "Authentication required",
       });
     }
-  
+
     const userRoleValue =
       typeof req.user.role === "string"
-        ? ROLES[req.user.role.toUpperCase()] // Convert string role to number
+        ? ROLES[req.user.role.toUpperCase()]
         : req.user.role;
 
     if (!userRoleValue || !Object.values(ROLES).includes(userRoleValue)) {
@@ -68,23 +63,18 @@ const Authorization = {
         message: "Invalid user role",
       });
     }
-  
+
     const allowedRoleValues = allowedRoles.map((role) =>
       typeof role === "string" ? ROLES[role.toUpperCase()] : role
     );
-  
-    const hasPermission = allowedRoleValues.includes(userRoleValue);
-  
-    if (hasPermission) {
-      return next();
-    }
-  
-    return res.status(403).json({ success: false, message: "Insufficient permissions" });
-  },  
 
-  /**
-   * Checks if user owns the resource or has admin rights
-   */
+    const hasPermission = allowedRoleValues.includes(userRoleValue);
+
+    return hasPermission
+      ? next()
+      : res.status(403).json({ success: false, message: "Insufficient permissions" });
+  },
+
   checkOwnership: (getResourceOwnerId) => (req, res, next) => {
     if (!req.user) {
       return res.status(401).json({
@@ -100,32 +90,22 @@ const Authorization = {
     return res.status(403).json({ success: false, message: "Access denied" });
   },
 
-  /**
-   * Combined check for both role and ownership
-   */
   checkRoleAndOwnership: (allowedRoles, resourceIdField) => {
     return (req, res, next) => {
       Authorization.verifyToken(req, res, () => {
-        const userRole = req.user.role;
+        const userRoleValue = typeof req.user.role === "string"
+          ? ROLES[req.user.role.toUpperCase()]
+          : req.user.role;
         const userId = req.user.id;
         const resourceId = req.params[resourceIdField];
 
-        // Check role first
-        const hasRole = allowedRoles.some((role) => userRole >= ROLES[role]);
-        if (!hasRole) {
-          return res.status(403).json({
-            success: false,
-            message: "Insufficient permissions",
-          });
-        }
+        const allowedRoleValues = allowedRoles.map((role) =>
+          typeof role === "string" ? ROLES[role.toUpperCase()] : role
+        );
 
-        // If user has admin role, allow access
-        if (userRole >= ROLES.ADMIN) {
-          return next();
-        }
+        const hasRole = allowedRoleValues.includes(userRoleValue);
 
-        // Check ownership
-        if (userId === resourceId) {
+        if (userRoleValue === ROLES.ADMIN || (hasRole && userId === resourceId)) {
           return next();
         }
 
