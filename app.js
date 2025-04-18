@@ -43,7 +43,7 @@ app.use(
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'"],
       styleSrc: ["'self'", 'https:', "'unsafe-inline'"],
-      imgSrc: ["'self'", 'data:', 'https:'],
+      imgSrc: ["'self'", 'data:', 'https:', 'https://workshop-management-server-io1kgvteu-marwaashraf1812s-projects.vercel.app/'],
       connectSrc: ["'self'"],
     },
   })
