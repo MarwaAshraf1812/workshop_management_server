@@ -74,7 +74,6 @@ app.use("/api/progress", progressRouter);
 app.use("/api/leaderboard", LeaderboardRouter);
 app.use("/auth", userRouter);
 
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.set('trust proxy', 1);
 // app.listen(process.env.PORT || 5000, () => {
