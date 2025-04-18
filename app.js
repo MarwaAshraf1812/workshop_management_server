@@ -33,7 +33,7 @@ io.on("connection", (socket) => {
   });
 });
 
- //prevent common vulnerabilities
+//prevent common vulnerabilities
 app.use(helmet());// Set security HTTP headers
 app.use(
   helmet.contentSecurityPolicy({
@@ -41,7 +41,7 @@ app.use(
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'"],
       styleSrc: ["'self'", 'https:', "'unsafe-inline'"],
-      imgSrc: ["'self'", 'data:', 'https:'],
+      imgSrc: ["'self'", 'data:', 'https:', '*.vercel.app'],
       connectSrc: ["'self'"],
     },
   })
