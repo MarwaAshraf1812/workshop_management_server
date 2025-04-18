@@ -75,13 +75,12 @@ app.use("/api/submissions", SubmissionRouter);
 app.use("/api/progress", progressRouter);
 app.use("/api/leaderboard", LeaderboardRouter);
 app.use("/auth", userRouter);
-app.use("/", 
-  () => {
-    res.status(200).json({
-      message: "Welcome to the Workshop Management System API",
-    });
-  }
-);
+app.use("/", (req, res) => {
+  res.status(200).json({
+    message: "Welcome to the Workshop Management System API",
+  });
+});
+
 
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
 
