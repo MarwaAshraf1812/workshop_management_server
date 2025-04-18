@@ -14,6 +14,8 @@ const express = require("express");
 const xss = require("xss-clean");
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
+var favicon = require('serve-favicon')
+var path = require('path')
 require("dotenv").config();
 
 const app = express();
@@ -33,7 +35,7 @@ io.on("connection", (socket) => {
   });
 });
 
- //prevent common vulnerabilities
+//prevent common vulnerabilities
 app.use(helmet());// Set security HTTP headers
 app.use(
   helmet.contentSecurityPolicy({
@@ -41,7 +43,7 @@ app.use(
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'"],
       styleSrc: ["'self'", 'https:', "'unsafe-inline'"],
-      imgSrc: ["'self'", 'data:', 'https:'],
+      imgSrc: ["'self'", 'data:', 'https:', 'https://workshop-management-server-io1kgvteu-marwaashraf1812s-projects.vercel.app/'],
       connectSrc: ["'self'"],
     },
   })
@@ -52,12 +54,12 @@ app.use(
  * to prevent DDoS attacks
  * and brute-force attacks 
  * */
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: "Too many requests from this IP, please try again later.",
-});
-app.use(limiter);
+// const limiter = rateLimit({
+//   windowMs: 15 * 60 * 1000,
+//   max: 100,
+//   message: "Too many requests from this IP, please try again later.",
+// });
+// app.use(limiter);
 
 app.use(express.json());
 
@@ -73,8 +75,18 @@ app.use("/api/submissions", SubmissionRouter);
 app.use("/api/progress", progressRouter);
 app.use("/api/leaderboard", LeaderboardRouter);
 app.use("/auth", userRouter);
-
-app.listen(process.env.PORT || 5000, () => {
-  console.log(`Server is running on port ${process.env.PORT || 5000}`);
+app.use("/", (req, res) => {
+  res.status(200).json({
+    message: "Welcome to the Workshop Management System API",
+  });
 });
-module.exports = { app, server, io };
+
+
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
+
+app.set('trust proxy', 1);
+// app.listen(process.env.PORT || 5000, () => {
+//   console.log(`Server is running on port ${process.env.PORT || 5000}`);
+// });
+// module.exports = { app, server, io };
+module.exports = app;
