@@ -35,17 +35,17 @@ io.on("connection", (socket) => {
 
 //prevent common vulnerabilities
 app.use(helmet());// Set security HTTP headers
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'", 'https:', "'unsafe-inline'"],
-      imgSrc: ["'self'", 'data:', 'https:'],
-      connectSrc: ["'self'"],
-    },
-  })
-);
+// app.use(
+//   helmet.contentSecurityPolicy({
+//     directives: {
+//       defaultSrc: ["'self'"],
+//       scriptSrc: ["'self'"],
+//       styleSrc: ["'self'", 'https:', "'unsafe-inline'"],
+//       imgSrc: ["'self'", 'data:', 'https:'],
+//       connectSrc: ["'self'"],
+//     },
+//   })
+// );
 
 /** Limiting the number of requests 
  * from a single IP address
