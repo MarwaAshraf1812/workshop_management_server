@@ -14,6 +14,8 @@ const express = require("express");
 const xss = require("xss-clean");
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
+var favicon = require('serve-favicon')
+var path = require('path')
 require("dotenv").config();
 
 const app = express();
@@ -74,6 +76,7 @@ app.use("/api/progress", progressRouter);
 app.use("/api/leaderboard", LeaderboardRouter);
 app.use("/auth", userRouter);
 
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
 
 app.set('trust proxy', 1);
 // app.listen(process.env.PORT || 5000, () => {
